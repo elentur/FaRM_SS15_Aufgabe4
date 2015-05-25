@@ -141,5 +141,7 @@ public class AppointmentTest {
 		assertTrue(app.getDauer() == 60);
 		app.setEndUhrzeit("14:00");
 		assertTrue(app.getDauer() == 120);
+		app.setStartUhrzeit("13:00");
+		assertTrue(app.getDauer() == 60);
 	}
 }

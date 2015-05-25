@@ -17,11 +17,10 @@ public class Appointment {
 	private StringProperty terminkategorie;
 	private StringProperty terminbezeichnung;	//wert ist pflicht
 	private StringProperty terminbeschreibung;
-
-	//IntergerProperties
-	private IntegerProperty dauer;
+	//IntegerProperties
 	private IntegerProperty startUhrzeitInt;
 	private IntegerProperty endUhrzeitInt;
+	private IntegerProperty dauer;
 	
 	/*
 	 * -------------------Konstruktor-------------------
@@ -30,28 +29,23 @@ public class Appointment {
 			throws EmptyStringException, TimeConflictException {
 		handleException(datum, startUhrzeit, endUhrzeit, terminkategorie, terminbezeichnung, terminbeschreibung);
 		this.datum = new SimpleStringProperty();
-		this.startUhrzeit = new SimpleStringProperty();
-		this.endUhrzeit = new SimpleStringProperty();
-		this.terminkategorie = new SimpleStringProperty();
-		this.terminbezeichnung = new SimpleStringProperty();
-		this.terminbeschreibung = new SimpleStringProperty();
-		
 		this.datum.set(datum);
+		this.startUhrzeit = new SimpleStringProperty();
 		this.startUhrzeit.set(startUhrzeit);
+		this.endUhrzeit = new SimpleStringProperty();
 		this.endUhrzeit.set(endUhrzeit);
+		this.terminkategorie = new SimpleStringProperty();
 		this.terminkategorie.set(terminkategorie);
+		this.terminbezeichnung = new SimpleStringProperty();
 		this.terminbezeichnung.set(terminbezeichnung);
+		this.terminbeschreibung = new SimpleStringProperty();
 		this.terminbeschreibung.set(terminbeschreibung);
-		
 		startUhrzeitInt = new SimpleIntegerProperty();
 		startUhrzeitInt.set(stringToMin(startUhrzeit));
 		endUhrzeitInt = new SimpleIntegerProperty();
 		endUhrzeitInt.set(stringToMin(endUhrzeit));
 		dauer = new SimpleIntegerProperty();
 		dauer.bind(endUhrzeitInt.subtract(startUhrzeitInt));
-		//Ohne Binding:
-//		dauer.set(stringToMin(endUhrzeit)-stringToMin(startUhrzeit));
-		
 	}
 
 	public Appointment(Appointment obj) {
