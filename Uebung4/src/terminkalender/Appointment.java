@@ -43,13 +43,15 @@ public class Appointment {
 		this.terminbezeichnung.set(terminbezeichnung);
 		this.terminbeschreibung.set(terminbeschreibung);
 		
-		// TODO mit date (?) ausrechnen
 		startUhrzeitInt = new SimpleIntegerProperty();
 		startUhrzeitInt.set(stringToMin(startUhrzeit));
 		endUhrzeitInt = new SimpleIntegerProperty();
 		endUhrzeitInt.set(stringToMin(endUhrzeit));
 		dauer = new SimpleIntegerProperty();
-		dauer.bind(endUhrzeitInt.divide(startUhrzeitInt));
+		dauer.bind(endUhrzeitInt.subtract(startUhrzeitInt));
+		//Ohne Binding:
+//		dauer.set(stringToMin(endUhrzeit)-stringToMin(startUhrzeit));
+		
 	}
 
 	public Appointment(Appointment obj) {
@@ -101,8 +103,10 @@ public class Appointment {
 			throw new EmptyStringException("Startzeit darf nicht leer sein");
 		else if (stringToMin(startUhrzeit) >= stringToMin(getEndUhrzeit()) || stringToMin(startUhrzeit) > 1440)
 			throw new TimeConflictException("Bitte Zeit überprüfen");
-		else
+		else {
 			this.startUhrzeit.set(startUhrzeit);
+			startUhrzeitInt.set(stringToMin(startUhrzeit));
+		}	
 	}
 
 	public StringProperty startUhrzeitProperty() {
@@ -126,8 +130,11 @@ public class Appointment {
 			throw new EmptyStringException("Endzeit darf nicht leer sein");
 		else if (stringToMin(endUhrzeit) <= stringToMin(getStartUhrzeit()) || stringToMin(endUhrzeit) > 1440)
 			throw new TimeConflictException("Bitte Zeit überprüfen");
-		else
+		else {
 			this.endUhrzeit.set(endUhrzeit);
+			endUhrzeitInt.set(stringToMin(endUhrzeit));
+		}
+		System.out.println(dauer.get());
 	}
 	
 	public StringProperty endUhrzeitProperty() {
@@ -184,11 +191,6 @@ public class Appointment {
 	public int getDauer() {
 		return dauer.get();
 	}
-
-//	evtl. nicht benötigt
-//	public void setDauerProperty(StringProperty dauerProperty) {
-//		this.dauerProperty = dauerProperty;
-//	}
 	
 	public IntegerProperty dauerProperty() {
 		return dauer;
@@ -206,12 +208,7 @@ public class Appointment {
 		String[] zeitAr = zeit.split(":");
 		return Integer.parseInt(zeitAr[0])*60 + Integer.parseInt(zeitAr[1]);
 	}
-	
-//	private int dauerBerechnen(String startUhrzeit, String endUhrzeit) {
-//		int i = stringToMin(endUhrzeit) - stringToMin(startUhrzeit);
-//		return i;
-//	}
-	
+
 	private void handleException (String datum, String startUhrzeit, String endUhrzeit, String terminkategorie, String terminbezeichnung, String terminbeschreibung) 
 			throws EmptyStringException, TimeConflictException {
 		if (datum == null || startUhrzeit == null || endUhrzeit == null || terminkategorie == null || terminbezeichnung == null || terminbeschreibung == null)
