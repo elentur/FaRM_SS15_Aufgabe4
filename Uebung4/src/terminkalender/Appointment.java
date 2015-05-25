@@ -10,6 +10,7 @@ import javafx.beans.property.StringProperty;
 public class Appointment {
 	
 	//wir gehen davon aus, dass Termine nur innerhalb eines Tages gemacht werden & die Uhrzeit im 24h-Format angegeben wird
+	//StringProperties
 	private StringProperty datum; 				//wert ist pflicht
 	private StringProperty startUhrzeit; 		//wert ist pflicht
 	private StringProperty endUhrzeit; 			//wert ist pflicht
@@ -17,6 +18,11 @@ public class Appointment {
 	private StringProperty terminbezeichnung;	//wert ist pflicht
 	private StringProperty terminbeschreibung;
 
+	//IntergerProperties
+	private IntegerProperty dauer;
+	private IntegerProperty startUhrzeitInt;
+	private IntegerProperty endUhrzeitInt;
+	
 	/*
 	 * -------------------Konstruktor-------------------
 	 */
@@ -37,6 +43,13 @@ public class Appointment {
 		this.terminbezeichnung.set(terminbezeichnung);
 		this.terminbeschreibung.set(terminbeschreibung);
 		
+		// TODO mit date (?) ausrechnen
+		startUhrzeitInt = new SimpleIntegerProperty();
+		startUhrzeitInt.set(stringToMin(startUhrzeit));
+		endUhrzeitInt = new SimpleIntegerProperty();
+		endUhrzeitInt.set(stringToMin(endUhrzeit));
+		dauer = new SimpleIntegerProperty();
+		dauer.bind(endUhrzeitInt.divide(startUhrzeitInt));
 	}
 
 	public Appointment(Appointment obj) {
@@ -168,6 +181,19 @@ public class Appointment {
 		return terminbeschreibung;
 	}
 	
+	public int getDauer() {
+		return dauer.get();
+	}
+
+//	evtl. nicht benötigt
+//	public void setDauerProperty(StringProperty dauerProperty) {
+//		this.dauerProperty = dauerProperty;
+//	}
+	
+	public IntegerProperty dauerProperty() {
+		return dauer;
+	}
+	
 	/*
 	 * -------------------weitere Meth.-------------------
 	 */
@@ -180,7 +206,12 @@ public class Appointment {
 		String[] zeitAr = zeit.split(":");
 		return Integer.parseInt(zeitAr[0])*60 + Integer.parseInt(zeitAr[1]);
 	}
-		
+	
+//	private int dauerBerechnen(String startUhrzeit, String endUhrzeit) {
+//		int i = stringToMin(endUhrzeit) - stringToMin(startUhrzeit);
+//		return i;
+//	}
+	
 	private void handleException (String datum, String startUhrzeit, String endUhrzeit, String terminkategorie, String terminbezeichnung, String terminbeschreibung) 
 			throws EmptyStringException, TimeConflictException {
 		if (datum == null || startUhrzeit == null || endUhrzeit == null || terminkategorie == null || terminbezeichnung == null || terminbeschreibung == null)
