@@ -30,7 +30,7 @@ public class ContactDetailsTest {
 			cd = new ObservableContactDetails("Huth", "Franzi","ff", "", "ff");
 		}
 		@Test (expected = IllegalArgumentException.class)
-		public void createObject_NullObjektInserted() throws KeyInUseException{
+		public void createObject_NullObjektInserted() throws KeyInUseException, EmptyNameException, EmptyFirstNameException, EmptyNumberException{
 			cd = new ObservableContactDetails(null);
 		}
 		@Test (expected = IllegalArgumentException.class)
