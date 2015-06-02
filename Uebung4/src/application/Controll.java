@@ -9,6 +9,7 @@ import exceptions.KeyInUseException;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -16,15 +17,20 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 public class Controll {
 	ObservableList<ObservableContactDetails> mObservableList;
 	private  AdressBook phonebook = new AdressBook();
 	private  ListView<ObservableContactDetails> listView;
-	private  TableView<ObservableContactDetails> tableView;//Noch unbenutzt
+	private  TableView<ObservableContactDetails> table;//Noch unbenutzt
 	private  Label errorText;
 	private  Button btnlstViewPrint;
 	
@@ -33,7 +39,7 @@ public class Controll {
 		 * Übergebne GUI-Objekte speichern
 		 */
 		this.listView = listView;
-		this.tableView = tableView;
+		this.table = tableView;
 		this.errorText = errorText;
 		this.btnlstViewPrint = btnlstViewPrint;
 		
@@ -47,7 +53,7 @@ public class Controll {
 		this.btnlstViewPrint.setOnAction(e -> System.out.println(this.phonebook));// Weißt dem Printbutton die Funktion zu das Adressbuch in die Console zu schreiben
 		this.listView.setItems(this.mObservableList);
 		this.listView.setCellFactory(p -> new MyListCell()); //Weist der Listview eine Benutzerdefinierte ListCell welche die eigenschaften der einzelnen Spalten der Listview definiert
-		
+		createTableView();
 		
 		
 	}
@@ -157,5 +163,29 @@ public class Controll {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void createTableView() {
+		table.setEditable(true);
+		TableColumn firstNameCol = new TableColumn("Vorname");
+		firstNameCol.setCellValueFactory(new PropertyValueFactory("vorname")); 
+		firstNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        TableColumn lastNameCol = new TableColumn("Nachname");
+        lastNameCol.setCellValueFactory(new PropertyValueFactory("name"));
+        lastNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        TableColumn streetCol = new TableColumn("Straße");
+        streetCol.setCellValueFactory(new PropertyValueFactory("adresse"));
+        streetCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        TableColumn telCol = new TableColumn("Telefon");
+        telCol.setCellValueFactory(new PropertyValueFactory("telefonNummer"));
+        telCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        TableColumn emailCol = new TableColumn("Mail");
+        emailCol.setCellValueFactory(new PropertyValueFactory("emailAdresse"));
+        emailCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        table.getColumns().addAll(firstNameCol, lastNameCol, streetCol, telCol, emailCol);
+        
+        table.setItems(mObservableList);
+        
+        
 	}
 }
