@@ -43,12 +43,12 @@ public class Appointment {
 	public Appointment(Appointment obj) {
 		if (obj == null)
 			throw new IllegalArgumentException("Ein Fehler ist aufgetreten");
-		this.datum.set(obj.getDatum());
-		this.startUhrzeit.set(obj.getStartUhrzeit());
-		this.endUhrzeit.set(obj.getEndUhrzeit());
-		this.terminkategorie.set(obj.getTerminkategorie());
-		this.terminbezeichnung.set(obj.getTerminbezeichnung());
-		this.terminbeschreibung.set(obj.getTerminbeschreibung());
+		this.datum = obj.datumProperty();
+		this.startUhrzeit = obj.startUhrzeitProperty();
+		this.endUhrzeit = obj.endUhrzeitProperty();
+		this.terminkategorie = obj.terminkategorieProperty();
+		this.terminbezeichnung = obj.terminbezeichnungProperty();
+		this.terminbeschreibung = obj.terminbeschreibungProperty();
 	}
 	
 	/*

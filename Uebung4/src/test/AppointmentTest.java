@@ -45,6 +45,12 @@ public class AppointmentTest {
 		app = new Appointment (null);
 	}
 	
+	@Test
+	public void testCopyConstructor_correctData() throws EmptyStringException, TimeConflictException {
+		app = new Appointment ("01.01.2015", "12:00", "13:00", "", "Mittagessen", "");
+		new Appointment (app);
+	}
+	
 	/*
 	 * -------SetterTest-------------
 	 */
