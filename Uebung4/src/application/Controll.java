@@ -12,6 +12,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -33,8 +34,9 @@ public class Controll {
 	private  TableView<ObservableContactDetails> table;//Noch unbenutzt
 	private  Label errorText;
 	private  Button btnlstViewPrint;
+	private  Button btnAdd;
 	
-	public Controll(ListView<ObservableContactDetails> listView,TableView<ObservableContactDetails> tableView,Label errorText,Button btnlstViewPrint){
+	public Controll(ListView<ObservableContactDetails> listView,TableView<ObservableContactDetails> tableView,Label errorText,Button btnlstViewPrint, Button btnAddTableContactDetail){
 		/*
 		 * Übergebne GUI-Objekte speichern
 		 */
@@ -42,6 +44,7 @@ public class Controll {
 		this.table = tableView;
 		this.errorText = errorText;
 		this.btnlstViewPrint = btnlstViewPrint;
+		this.btnAdd = btnAddTableContactDetail;
 		
 		/*
 		 * Adressbuch füllen
@@ -49,14 +52,30 @@ public class Controll {
 		 */
 		fillAdressbook();
 		ObservableContactDetails[] obj = this.phonebook.search("");
-		mObservableList = FXCollections.observableArrayList(Arrays.asList(obj));
+		
+		mObservableList = FXCollections.observableArrayList(ObservableContactDetails.extractor());
+		mObservableList.addAll(obj);
 		this.btnlstViewPrint.setOnAction(e -> System.out.println(this.phonebook));// Weißt dem Printbutton die Funktion zu das Adressbuch in die Console zu schreiben
 		this.listView.setItems(this.mObservableList);
 		this.listView.setCellFactory(p -> new MyListCell()); //Weist der Listview eine Benutzerdefinierte ListCell welche die eigenschaften der einzelnen Spalten der Listview definiert
 		createTableView();
+		this.btnAdd.setOnAction(b -> handleButtonAction());
 		
 		
 	}
+	private void handleButtonAction() {
+		try {
+			ObservableContactDetails newContact= new ObservableContactDetails("new", "new", "new", "new", "new");
+			mObservableList.add(newContact);
+			phonebook.addDetails(newContact);
+			
+		} catch (EmptyNameException | EmptyFirstNameException | KeyInUseException
+				| EmptyNumberException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	     
+	 }
 	/*
 	 * Benutzerdefinierte ListCell klasse als Innere Klasse
 	 * Muss erzeug werden, weil die standart Vorgaben mit unserem Objekttyp nicht umgehen können(also was das bearbeiten der Einträge angeht)
@@ -165,22 +184,24 @@ public class Controll {
 
 	}
 
+	
+	@SuppressWarnings("unchecked")
 	private void createTableView() {
 		table.setEditable(true);
-		TableColumn firstNameCol = new TableColumn("Vorname");
-		firstNameCol.setCellValueFactory(new PropertyValueFactory("vorname")); 
+		TableColumn <ObservableContactDetails, String>firstNameCol = new TableColumn<>("Vorname");
+		firstNameCol.setCellValueFactory(new PropertyValueFactory<>("vorname")); 
 		firstNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        TableColumn lastNameCol = new TableColumn("Nachname");
-        lastNameCol.setCellValueFactory(new PropertyValueFactory("name"));
+        TableColumn<ObservableContactDetails, String> lastNameCol = new TableColumn<ObservableContactDetails, String>("Nachname");
+        lastNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         lastNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        TableColumn streetCol = new TableColumn("Straße");
-        streetCol.setCellValueFactory(new PropertyValueFactory("adresse"));
+        TableColumn<ObservableContactDetails, String> streetCol = new TableColumn<ObservableContactDetails, String>("Straße");
+        streetCol.setCellValueFactory(new PropertyValueFactory<>("adresse"));
         streetCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        TableColumn telCol = new TableColumn("Telefon");
-        telCol.setCellValueFactory(new PropertyValueFactory("telefonNummer"));
+        TableColumn<ObservableContactDetails, String> telCol = new TableColumn<ObservableContactDetails, String>("Telefon");
+        telCol.setCellValueFactory(new PropertyValueFactory<>("telefonNummer"));
         telCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        TableColumn emailCol = new TableColumn("Mail");
-        emailCol.setCellValueFactory(new PropertyValueFactory("emailAdresse"));
+        TableColumn<ObservableContactDetails, String> emailCol = new TableColumn<ObservableContactDetails, String>("Mail");
+        emailCol.setCellValueFactory(new PropertyValueFactory<>("emailAdresse"));
         emailCol.setCellFactory(TextFieldTableCell.forTableColumn());
         table.getColumns().addAll(firstNameCol, lastNameCol, streetCol, telCol, emailCol);
         

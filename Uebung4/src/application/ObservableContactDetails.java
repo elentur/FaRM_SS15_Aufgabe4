@@ -1,7 +1,9 @@
 package application;
 
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.util.Callback;
 import exceptions.EmptyFirstNameException;
 import exceptions.EmptyNameException;
 import exceptions.EmptyNumberException;
@@ -40,6 +42,10 @@ public class ObservableContactDetails extends ContactDetails {
 		this.emailAdresse = new SimpleStringProperty(super.getEmailAdresse());
 
 	}
+	public static Callback<ObservableContactDetails, Observable[]> extractor() {
+		   return (ObservableContactDetails p) -> new Observable[]{p.name, p.vorname, p.adresse, p.telefonNummer,p.emailAdresse};
+		}
+
 
 	public String getName() {
 		return name.get();
