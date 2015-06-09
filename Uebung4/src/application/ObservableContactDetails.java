@@ -42,11 +42,26 @@ public class ObservableContactDetails extends ContactDetails {
 		this.emailAdresse = new SimpleStringProperty(super.getEmailAdresse());
 
 	}
+	
+	//Kurzschreibweise
+	//public static Callback<ObservableContactDetails, Observable[]> extractor() {
+	//	   return (ObservableContactDetails p) -> new Observable[]{p.name, p.vorname, p.adresse, p.telefonNummer,p.emailAdresse};
+	//	}
+
+
 	public static Callback<ObservableContactDetails, Observable[]> extractor() {
-		   return (ObservableContactDetails p) -> new Observable[]{p.name, p.vorname, p.adresse, p.telefonNummer,p.emailAdresse};
+		   return new Callback<ObservableContactDetails, Observable[]>() {
+
+			@Override
+			public Observable[] call(ObservableContactDetails p) {
+				System.out.println("The extractor is called for: " + p.getName());
+				return new Observable[]{p.name, p.vorname, p.adresse, p.telefonNummer,p.emailAdresse};
+			}  
+		   };
+		   
 		}
 
-
+	
 	public String getName() {
 		return name.get();
 	}
