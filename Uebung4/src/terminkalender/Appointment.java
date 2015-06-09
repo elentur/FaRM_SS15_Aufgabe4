@@ -28,22 +28,14 @@ public class Appointment {
 	public Appointment(String datum, String startUhrzeit, String endUhrzeit, String terminkategorie, String terminbezeichnung, String terminbeschreibung) 
 			throws EmptyStringException, TimeConflictException {
 		handleException(datum, startUhrzeit, endUhrzeit, terminkategorie, terminbezeichnung, terminbeschreibung);
-		this.datum = new SimpleStringProperty();
-		this.datum.set(datum);
-		this.startUhrzeit = new SimpleStringProperty();
-		this.startUhrzeit.set(startUhrzeit);
-		this.endUhrzeit = new SimpleStringProperty();
-		this.endUhrzeit.set(endUhrzeit);
-		this.terminkategorie = new SimpleStringProperty();
-		this.terminkategorie.set(terminkategorie);
-		this.terminbezeichnung = new SimpleStringProperty();
-		this.terminbezeichnung.set(terminbezeichnung);
-		this.terminbeschreibung = new SimpleStringProperty();
-		this.terminbeschreibung.set(terminbeschreibung);
-		startUhrzeitInt = new SimpleIntegerProperty();
-		startUhrzeitInt.set(stringToMin(startUhrzeit));
-		endUhrzeitInt = new SimpleIntegerProperty();
-		endUhrzeitInt.set(stringToMin(endUhrzeit));
+		this.datum = new SimpleStringProperty(datum);
+		this.startUhrzeit = new SimpleStringProperty(startUhrzeit);
+		this.endUhrzeit = new SimpleStringProperty(endUhrzeit);
+		this.terminkategorie = new SimpleStringProperty(terminkategorie);
+		this.terminbezeichnung = new SimpleStringProperty(terminbezeichnung);
+		this.terminbeschreibung = new SimpleStringProperty(terminbeschreibung);
+		startUhrzeitInt = new SimpleIntegerProperty(stringToMin(startUhrzeit));
+		endUhrzeitInt = new SimpleIntegerProperty(stringToMin(endUhrzeit));
 		dauer = new SimpleIntegerProperty();
 		dauer.bind(endUhrzeitInt.subtract(startUhrzeitInt));
 	}
@@ -51,12 +43,12 @@ public class Appointment {
 	public Appointment(Appointment obj) {
 		if (obj == null)
 			throw new IllegalArgumentException("Ein Fehler ist aufgetreten");
-		this.datum.set(obj.getDatum());
-		this.startUhrzeit.set(obj.getStartUhrzeit());
-		this.endUhrzeit.set(obj.getEndUhrzeit());
-		this.terminkategorie.set(obj.getTerminkategorie());
-		this.terminbezeichnung.set(obj.getTerminbezeichnung());
-		this.terminbeschreibung.set(obj.getTerminbeschreibung());
+		this.datum = obj.datumProperty();
+		this.startUhrzeit = obj.startUhrzeitProperty();
+		this.endUhrzeit = obj.endUhrzeitProperty();
+		this.terminkategorie = obj.terminkategorieProperty();
+		this.terminbezeichnung = obj.terminbezeichnungProperty();
+		this.terminbeschreibung = obj.terminbeschreibungProperty();
 	}
 	
 	/*
@@ -128,7 +120,6 @@ public class Appointment {
 			this.endUhrzeit.set(endUhrzeit);
 			endUhrzeitInt.set(stringToMin(endUhrzeit));
 		}
-		System.out.println(dauer.get());
 	}
 	
 	public StringProperty endUhrzeitProperty() {
