@@ -191,7 +191,7 @@ public class Appointment {
 	 * @return int Zeit in min
 	 */
 	private int stringToMin(String zeit) {
-		String[] zeitAr = zeit.split(":");
+		String[] zeitAr = zeit.trim().split(":");
 		return Integer.parseInt(zeitAr[0])*60 + Integer.parseInt(zeitAr[1]);
 	}
 
