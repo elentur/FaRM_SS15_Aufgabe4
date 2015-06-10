@@ -21,6 +21,7 @@ public class Appointment {
 	private IntegerProperty startUhrzeitInt;
 	private IntegerProperty endUhrzeitInt;
 	private IntegerProperty dauer;
+	private static final int TAG_IN_MIN = 1440;
 	
 	/*
 	 * -------------------Konstruktor-------------------
@@ -87,7 +88,7 @@ public class Appointment {
 			throw new IllegalArgumentException("Ein Fehler ist aufgetreten");
 		else if (startUhrzeit.isEmpty())
 			throw new EmptyStringException("Startzeit darf nicht leer sein");
-		else if (stringToMin(startUhrzeit) >= stringToMin(getEndUhrzeit()) || stringToMin(startUhrzeit) > 1440)
+		else if (stringToMin(startUhrzeit) >= stringToMin(getEndUhrzeit()) || stringToMin(startUhrzeit) > TAG_IN_MIN)
 			throw new TimeConflictException("Bitte Zeit überprüfen");
 		else {
 			this.startUhrzeit.set(startUhrzeit);
@@ -114,7 +115,7 @@ public class Appointment {
 			throw new IllegalArgumentException("Ein Fehler ist aufgetreten");
 		else if (endUhrzeit.isEmpty())
 			throw new EmptyStringException("Endzeit darf nicht leer sein");
-		else if (stringToMin(endUhrzeit) <= stringToMin(getStartUhrzeit()) || stringToMin(endUhrzeit) > 1440)
+		else if (stringToMin(endUhrzeit) <= stringToMin(getStartUhrzeit()) || stringToMin(endUhrzeit) > TAG_IN_MIN)
 			throw new TimeConflictException("Bitte Zeit überprüfen");
 		else {
 			this.endUhrzeit.set(endUhrzeit);
@@ -200,7 +201,7 @@ public class Appointment {
 			throw new IllegalArgumentException("Ein Fehler ist aufgetreten");
 		if (datum.isEmpty() || startUhrzeit.isEmpty() || endUhrzeit.isEmpty() || terminbezeichnung.isEmpty())
 			throw new EmptyStringException("Feld darf nicht leer sein");
-		if (stringToMin(endUhrzeit) <= stringToMin(startUhrzeit) || stringToMin(endUhrzeit) > 1440 || stringToMin(startUhrzeit) > 1440)
+		if (stringToMin(endUhrzeit) <= stringToMin(startUhrzeit) || stringToMin(endUhrzeit) > TAG_IN_MIN || stringToMin(startUhrzeit) > TAG_IN_MIN)
 			throw new TimeConflictException("Bitte Zeit überprüfen");
 	}
 }
