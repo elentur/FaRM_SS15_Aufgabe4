@@ -57,7 +57,7 @@ AdressBook mAdressBook;
 		Key key = new Key("Huth","Franzi","123");
 		assertEquals(key, mAdressBook.getKey(new ObservableContactDetails("Huth", "Franzi","fff", "123", "ff")));
 	}
-	@Test (expected = IllegalArgumentException.class)
+	@Test (expected = NullPointerException.class)
 	public void getKey_FromNullObject() throws KeyInUseException, EmptyNameException, EmptyFirstNameException, EmptyNumberException{
 		mAdressBook.getKey(new ObservableContactDetails(null));
 		
