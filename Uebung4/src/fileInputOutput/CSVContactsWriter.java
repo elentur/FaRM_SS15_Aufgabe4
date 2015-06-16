@@ -9,6 +9,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.EmptyFirstNameException;
+import exceptions.EmptyNameException;
+import exceptions.EmptyNumberException;
 import application.ContactDetails;
 
 public class CSVContactsWriter {
@@ -27,10 +30,36 @@ public class CSVContactsWriter {
 		for (ContactDetails contact : contacts) {
 			lines.add(contactAsCSVLine(contact, splitter));
 		}
+		System.out.println(lines.toString());
 		Files.write(path, lines, ENCODING);
 	}
 
 	private static String contactAsCSVLine(ContactDetails c, String splitter) {
 		return c.getName()+splitter+c.getVorname()+splitter+c.getAdresse()+splitter+c.getTelefonNummer()+splitter+c.getEmailAdresse();
 	}
+
+//	//------------------------- Test --------------------------
+//	/*
+//	 * Main-Methode zum testen: schreibt Test-Datei in aktuelles Verzeichnis und befüllt diese mit ContactDetails
+//	 */
+//	public static void Main(String[] args) throws IOException {
+//		
+//		new CSVContactsWriter();
+//		
+//		//ArrayList von ContactDetails-Kontakten erstellen
+//		List<ContactDetails> contacts = new ArrayList<>();
+//		try {
+//			contacts.add(new ContactDetails("Wurst", "Hans", "Gruenbergstraße 12", "0349555", "mailWurst@gmx.com"));
+//			contacts.add(new ContactDetails("Mayer", "Hans", "Hasen 12", "0349555", "mailMayer@gmx.com"));
+//			contacts.add(new ContactDetails("Zott", "Anna", "Burgstraße 2", "0178564555", "mailAnna@web.com"));
+//		} catch (EmptyNameException | EmptyFirstNameException | EmptyNumberException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		//aktuelles Verzeichnis holen und Pfad an Meth. (zweite) übergeben
+//		String current = System.getProperty("user.dir");
+//		Path testPath = Paths.get(current, "pgrTest.csv");
+//		CSVContactsWriter.writeEntityList(contacts, testPath, ";");
+//	}
+	
 }
