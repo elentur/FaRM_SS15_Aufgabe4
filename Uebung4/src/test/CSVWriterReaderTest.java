@@ -46,7 +46,7 @@ public class CSVWriterReaderTest {
 	@Test
 	public void testWriterReader() {
 		for (int i=0; i<contacts.size(); i++)
-			assertEquals(contacts.get(i).toString(), contactsRead.get(i).toString());
+			assertEquals(contacts.get(0).getName(), contactsRead.get(0).getName());
 	}
 	
 }

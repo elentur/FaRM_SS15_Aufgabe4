@@ -8,17 +8,17 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import dao.CsvDao;
 import exceptions.EmptyStringException;
 import exceptions.TimeConflictException;
+import fileInputOutput.TerminkalenderDao;
 import terminkalender.Appointment;
 
 public class CsvDaoTest {
-	private CsvDao dao;
+	private TerminkalenderDao dao;
 
 	@Before
 	public void setUp() throws Exception {
-		dao = new CsvDao("test.csv");
+		dao = new TerminkalenderDao("test.csv");
 	}
 
 	@Test

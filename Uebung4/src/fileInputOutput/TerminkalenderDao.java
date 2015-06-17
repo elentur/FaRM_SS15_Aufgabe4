@@ -1,4 +1,4 @@
-package dao;
+package fileInputOutput;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,7 @@ import exceptions.EmptyStringException;
 import exceptions.TimeConflictException;
 import terminkalender.*;
 
-public class CsvDao {
+public class TerminkalenderDao {
 	List<Appointment> appointmentList = new ArrayList<Appointment>();
 	FileWriter writer;
 	File file;
@@ -23,11 +23,11 @@ public class CsvDao {
 	 * 
 	 * @param sourceOfFile, is the path of the file
 	 */
-	public CsvDao(String sourceOfFile) {
+	public TerminkalenderDao(String sourceOfFile) {
 		this.sourceOfTerminkalenderFile = sourceOfFile;
 	}
 
-	/*
+	/**
 	 * load words from txt-file and put them into an ArrayList
 	 * 
 	 * @return ArrayList, return entries in a ArrayList from type Appointment
