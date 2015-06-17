@@ -25,8 +25,7 @@ public class CSVContactsReaderBuffered {
 		try {
 			BufferedReader br = Files.newBufferedReader(source);
 			String line;
-			while (br.readLine() != null) {
-				line = br.readLine();
+			while ((line=br.readLine()) != null) {
 				String [] detailsAr = line.split(splitter);
 				try {
 					target.add(new ContactDetails(detailsAr[0], detailsAr[1], detailsAr[2], detailsAr[3], detailsAr[4]));

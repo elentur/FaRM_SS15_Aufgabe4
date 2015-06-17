@@ -24,9 +24,9 @@ public class CSVWriterReaderBufferedTest {
 	@Before
 	public void setUp() throws Exception {
 		contacts = new ArrayList<>();
-		contacts.add(new ContactDetails("Wurst", "Hans", "Gruenbergstraße 12", "0349555", "mailWurst@gmx.com"));
+		contacts.add(new ContactDetails("Wurst", "Hans", "Gruenbergstrasse 12", "0349555", "mailWurst@gmx.com"));
 		contacts.add(new ContactDetails("Mayer", "Hans", "Hasen 12", "0349555", "mailMayer@gmx.com"));
-		contacts.add(new ContactDetails("Zott", "Anna", "Burgstraße 2", "0178564555", "mailAnna@web.com"));
+		contacts.add(new ContactDetails("Zott", "Anna", "Burgstrasse 2", "0178564555", "mailAnna@web.com"));
 		try {
 			CSVContactsWriterBuffered.writeEntityList(contacts, "test.csv", ";");
 		} catch (IOException e) {
@@ -38,7 +38,7 @@ public class CSVWriterReaderBufferedTest {
 	@Test
 	public void testWriterReader() {
 		for (int i=0; i<contacts.size(); i++)
-			assertEquals(contacts.get(i), contactsRead.get(i));
+			assertEquals(contacts.get(i).toString(), contactsRead.get(i).toString());
 	}
 	
 }

@@ -25,7 +25,7 @@ public class CSVContactsWriterBuffered {
 	
 	public static void writeEntityList(List<ContactDetails> contacts, Path path, String splitter) 
 			throws IOException {
-		BufferedWriter bw = Files.newBufferedWriter(path, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+		BufferedWriter bw = Files.newBufferedWriter(path, StandardOpenOption.CREATE);
 		for (ContactDetails contact : contacts) {
 			bw.write(contactAsCSVLine(contact, splitter) + "\n");
 		}
