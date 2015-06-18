@@ -29,5 +29,6 @@ public class TerminkalenderOutputStream extends DataOutputStream{
 		writeUTF(kalender.getTerminkategorie());
 		writeUTF(kalender.getTerminbezeichnung());
 		writeUTF(kalender.getTerminbeschreibung());
+	
 	}
 }
