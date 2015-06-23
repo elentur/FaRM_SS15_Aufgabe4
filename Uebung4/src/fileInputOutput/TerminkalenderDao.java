@@ -11,15 +11,19 @@ import java.util.List;
 import exceptions.EmptyStringException;
 import exceptions.TimeConflictException;
 import terminkalender.*;
-
+/**
+ * 
+ * @author Franziska Huth, Roman Duhr, Marcus Bätz
+ *
+ */
 public class TerminkalenderDao {
 	List<Appointment> appointmentList = new ArrayList<Appointment>();
 	FileWriter writer;
 	File file;
 	String sourceOfTerminkalenderFile;
 
-	/*
-	 * Konstruktor
+	/**
+	 * Constructor
 	 * 
 	 * @param sourceOfFile, is the path of the file
 	 */
@@ -48,6 +52,7 @@ public class TerminkalenderDao {
 					appointmentList.add(entry);
 
 				}
+				eingabe.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -56,11 +61,10 @@ public class TerminkalenderDao {
 		return appointmentList;
 	}
 
-	/*
+	/**
 	 * Write parameters at the end of an txt-file,if txt-file don't exist create
 	 * new one.
-	 * 
-	 * @
+	 * @param myAppointmentList, list of Appointment Objects
 	 */
 	public void saveAppointmentList(List<Appointment> myAppointmentList) {
 		Appointment entry;

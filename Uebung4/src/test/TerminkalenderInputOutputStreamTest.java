@@ -49,8 +49,8 @@ public class TerminkalenderInputOutputStreamTest {
 	}
 	
 	
-	@Test(expected=FieldReadingException.class)
-	public void testFieldReadingException() throws EmptyStringException, TimeConflictException, FieldReadingException, IOException {
+	@Test(expected=IOException.class)
+	public void testIOException() throws EmptyStringException, TimeConflictException, FieldReadingException, IOException {
 		
 			TerminkalenderOutputStream out = new TerminkalenderOutputStream("kalender3.bin");	
 			out.close();

@@ -13,33 +13,47 @@ import exceptions.EmptyStringException;
 import exceptions.FieldReadingException;
 import exceptions.TimeConflictException;
 import terminkalender.Appointment;
-
+/**
+ * 
+ * @author Franziska Huth, Roman Duhr, Marcus Bätz
+ *
+ */
 public class TerminkalenderInputStream extends DataInputStream {
-
-	public TerminkalenderInputStream(InputStream out) {
-		super(out);
+	
+	/**
+	 * Creates a new DataInputStream
+	 * @param in, InputStream Object
+	 */
+	public TerminkalenderInputStream(InputStream in) {
+		super(in);
 	}
-
+	/**
+	 * Creates a new DataInputStream with "calender.bin" as default filename
+	 * @throws FileNotFoundException
+	 */
 	public TerminkalenderInputStream() throws FileNotFoundException {
 		this("calender.bin");
 	}
-
+	/**
+	 * Creates a new DataInputStream with a FileInputStream form the filename
+	 * @param filename, name of the file 
+	 * @throws FileNotFoundException
+	 */
 	public TerminkalenderInputStream(String filename) throws FileNotFoundException {
 		super(new FileInputStream(filename));
 	}
 
 	/**
-	 * Lese Binary File
-	 * @return Appointment, mit ausgelesenen Parametern (String datum, String
+	 * Read Binary File
+	 * @return Appointment, with Parameter readout (String datum, String
 	 *         startUhrzeit, String endUhrzeit, String terminkategorie, String
 	 *         terminbezeichnung, String terminbeschreibung)
 	 * @throws EmptyStringException
 	 * @throws TimeConflictException
-	 * @throws FieldReadingException
-	 *             , damit User Nachricht bekommt, dass es Probleme beim
-	 *             Fileauslesen gab.
+	 * @throws IOException
+	 *             , to show the user a Confilct if the File could not be read out.
 	 */
-	public Appointment readCalender() throws EmptyStringException, TimeConflictException, FieldReadingException {
+	public Appointment readCalender() throws EmptyStringException, TimeConflictException, IOException {
 		String w1, w2, w3, w4, w5, w6;
 		try {
 			w1 = readUTF();
@@ -49,7 +63,7 @@ public class TerminkalenderInputStream extends DataInputStream {
 			w5 = readUTF();
 			w6 = readUTF();
 		} catch (IOException iox) {
-			throw new FieldReadingException("Datei kann nicht ausgelesen werden");
+			throw new IOException("Datei kann nicht ausgelesen werden");
 		}
 		return new Appointment(w1, w2, w3, w4, w5, w6);
 	}
