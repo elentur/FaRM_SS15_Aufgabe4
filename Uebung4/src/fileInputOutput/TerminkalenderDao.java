@@ -62,7 +62,7 @@ public class TerminkalenderDao {
 	}
 
 	/**
-	 * Write parameters at the end of an txt-file,if txt-file don't exist create
+	 * Write parameters in a text-file and overwrite old data. If txt-file don't exist create
 	 * new one.
 	 * @param myAppointmentList, list of Appointment Objects
 	 */

@@ -42,7 +42,7 @@ public class TerminkalenderOutputStream extends DataOutputStream{
 	 * write Binary File
 	 * @param  Appointment Object
 	 * @throws IOException
-	 *             , to show the user a Confilct if the File could not be written.
+	 *             ,to show the user a Conflict if the File could not be written.
 	 */
 	public void writeCalender(Appointment kalender)throws IOException{
 		try{

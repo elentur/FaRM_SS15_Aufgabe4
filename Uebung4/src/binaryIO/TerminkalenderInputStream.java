@@ -51,7 +51,7 @@ public class TerminkalenderInputStream extends DataInputStream {
 	 * @throws EmptyStringException
 	 * @throws TimeConflictException
 	 * @throws IOException
-	 *             , to show the user a Confilct if the File could not be read out.
+	 *             , to show the user a Conflict if the File could not be read out.
 	 */
 	public Appointment readCalender() throws EmptyStringException, TimeConflictException, IOException {
 		String w1, w2, w3, w4, w5, w6;
@@ -63,7 +63,7 @@ public class TerminkalenderInputStream extends DataInputStream {
 			w5 = readUTF();
 			w6 = readUTF();
 		} catch (IOException iox) {
-			throw new IOException("Datei kann nicht ausgelesen werden");
+			throw new IOException("Datei kann nicht ausgelesen werden.");
 		}
 		return new Appointment(w1, w2, w3, w4, w5, w6);
 	}

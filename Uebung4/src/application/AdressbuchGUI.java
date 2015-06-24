@@ -16,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-
 public class AdressbuchGUI extends Application {
 	public ListView<ObservableContactDetails> listView = new ListView<ObservableContactDetails>() ;
 	public TableView<ObservableContactDetails> tableView = new TableView<ObservableContactDetails>();

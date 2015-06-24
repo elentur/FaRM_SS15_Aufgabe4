@@ -23,8 +23,8 @@ public class CSVContactsReaderBuffered {
 	 * Creates a Path File from the filename String and 
 	 * call then the same function with this pathfile and the splitter file
 	 * @param filename, String with the filename
-	 * @param splitter, String with the spiltter symbol
-	 * @return List of Contactdetails
+	 * @param splitter, String with the splitter symbol
+	 * @return List of ContactDetails
 	 * @throws IOException if the filename is not found in the rootpath
 	 */
 	public static List<ContactDetails> readEntityList(String filename, String splitter)throws IOException {
@@ -32,11 +32,11 @@ public class CSVContactsReaderBuffered {
 	}
 
 	/**
-	 * Reads all Lines of an Textfile using the Splitter to seperate each Parameter from the other in each Line.
+	 * Reads all Lines of an Textfile using the Splitter to separate each Parameter from the other in each Line.
 	 * For each Line, creating on new ContactdetailsObject with all Parameters from this Line an push it into the List.
-	 * @param source, pathfile containing the filename and the path. Without changes, the path ist the rootpath of the Programm
-	 * @param splitter, String with the spiltter symbol
-	 * @return List of Contactdetails
+	 * @param source, pathfile containing the filename and the path. Without changes, the path is the rootpath of the program
+	 * @param splitter, String with the splitter symbol
+	 * @return List of ContactDetails
 	 * @throws IOException if the filename and/or the path is not found
 	 */
 	public static List<ContactDetails> readEntityList(Path source, String splitter) throws IOException {
