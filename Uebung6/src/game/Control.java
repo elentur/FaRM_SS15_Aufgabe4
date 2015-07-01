@@ -4,6 +4,11 @@ package game;
 
 
 import java.awt.Point;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Random;
 
 import javafx.scene.control.Label;
@@ -162,11 +167,34 @@ public class Control {
 				return;
 			}
 			checkVictory(enemie);
+			writeFile(enemie);
+			readFile(me);
 			shootKI();
 			checkVictory(me);
+			
 			infoText.setLap(infoText.getLap()+1);
 			setColor();
 			setText();
+			//schreibe meinen spielenstand
+			writeFile(me);
+			//lade das Spiel vom Gegner für meinen nächsten Zug
+			readFile(enemie);
+		}
+		
+	}
+	
+	private void readFile(Player player) {
+		try {
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(player.getName()+"obj"));
+			if(player==me){
+				me = (Player)in.readObject();
+			}else{
+				enemie = (Player)in.readObject();
+			}
+			
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 	}
@@ -178,18 +206,35 @@ public class Control {
 				if (player.getShips().get(i).isDestroyed() ) infoText.setShip1(infoText.getShip1()-1);
 			}
 			if(infoText.getShip1() == 0)	infoText.setMsg(enemie.getName() + " hat gewonnen.");
+			
 		}else{
 			infoText.setShip2(10);
 			for(int i = 0; i<player.getShips().size() ; i++){
 				if (player.getShips().get(i).isDestroyed() ) infoText.setShip2(infoText.getShip2()-1);
 			}
 			if(infoText.getShip2() == 0)	infoText.setMsg(me.getName() + " hat gewonnen.");
+			
+
 		}
+		
 		
 		setText();
 	}
 	
+	private void writeFile(Player player) {
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(player.getName() + ".obj"));
+			out.writeObject(player);
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	private void shootKI(){
+		
+		//TODO read file
 		boolean hit = false;
 		//(Point pos = new Point(kiShootPos.x,kiShootPos.y);
 		Point pos = new Point();
