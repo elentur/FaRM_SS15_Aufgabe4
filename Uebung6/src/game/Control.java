@@ -78,7 +78,7 @@ public class Control {
 		if (enter){
 			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null,null)));
 		}else{
-			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.BLACK,null, null, null)));
+			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID, null, null)));
 		}
 	}
 	
