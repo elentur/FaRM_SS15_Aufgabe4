@@ -10,6 +10,7 @@ import exception.WrongPlaceException;
 
 public class Player implements Serializable{
 	
+	private static final int MAX_SHIP_TYP_NUMBER = 5;
 	private String name;
 	private boolean turn;
 	private PlayingField battlefield;
@@ -21,8 +22,9 @@ public class Player implements Serializable{
 	
 	public Player(String name){
 		this.name = name;
+		//my field where i save my ships, but not playing with it
 		battlefield = new PlayingField();
-		createShips();
+		createShipsAndPlaceThem();
 	}
 	
 	public String getName(){
@@ -33,17 +35,19 @@ public class Player implements Serializable{
 		return ships;
 	}
 	
-	private void createShips(){
+	private void createShipsAndPlaceThem(){
 		Random rnd = new Random();
 		int ship;
 		int size;
 		Point pos;
 		boolean horizontal;
-		for (int i = 1 ; i < 5;i++){
+		for (int i = 1 ; i < MAX_SHIP_TYP_NUMBER;i++){
 			ship = 0;
 			size = 6-i;
 			while(ship != i){
+				//set horizontal or vertical position by random
 				horizontal = rnd.nextInt(2) == 1? true:false;
+				//pos=startpoint
 				pos = new Point(rnd.nextInt(10),rnd.nextInt(10));
 				if((horizontal && pos.x+size <=9) || (!horizontal && pos.y+size <=9 )){
 					

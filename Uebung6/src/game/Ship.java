@@ -15,7 +15,10 @@ public abstract class Ship implements Figure {
 	protected boolean destroyed=false;
 	protected boolean[] hit;
 	protected Point position;
-	
+	public Ship(Point position,boolean horizontal){
+		this.position = position;
+		this.horizontal=horizontal;
+	}
 	public boolean isHorizontal(){
 		return horizontal;
 	}

@@ -12,10 +12,10 @@ public class Battleship extends Ship {
 	private static final long serialVersionUID = 1L;
 
 	public Battleship(Point position, boolean horizontal){
-		this.size = 5;
+		super(position,horizontal);
+		size = 5;
 		hit = new boolean[5];
-		this.position=position;
-		this.horizontal = horizontal;
+		
 	}
 	
 }
