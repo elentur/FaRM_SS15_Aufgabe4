@@ -78,7 +78,7 @@ public class Control {
 		if (enter){
 			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null,null)));
 		}else{
-			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
+			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.BLACK,null, null, null)));
 		}
 	}
 	
@@ -191,10 +191,12 @@ public class Control {
 	
 	private void shootKI(){
 		boolean hit = false;
-		Point pos = new Point(kiShootPos.x,kiShootPos.y);
+		//(Point pos = new Point(kiShootPos.x,kiShootPos.y);
+		Point pos = new Point();
 		Random rnd = new Random();
 		while(!hit){
-					if (pos.x > 9 || pos.x < 0) pos.x = rnd.nextInt(10);
+			
+				/*	if (pos.x > 9 || pos.x < 0) pos.x = rnd.nextInt(10);
 					if (pos.y > 9 || pos.y < 0) pos.x = rnd.nextInt(10);
 					if(kiPlan[pos.x][pos.y] == 0){
 						hit =me.getBattlefield().shoot(pos);
@@ -213,10 +215,13 @@ public class Control {
 						if (s.isHorizontal()){
 							
 						}
-					}
-
+					}*/
+			pos.x = rnd.nextInt(10);
+			pos.y = rnd.nextInt(10);
+			hit =me.getBattlefield().shoot(pos);
 		}
 		kiShootPos.x = pos.x;
 		kiShootPos.y = pos.y;
+			
 	}
 }
