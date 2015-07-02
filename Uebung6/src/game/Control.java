@@ -26,64 +26,70 @@ import javafx.scene.paint.Color;
 
 
 public class Control {
-	HBox[] rowDown = new HBox[10];
-	VBox[][] columnDown = new VBox[10][10];
-	HBox[] rowUp = new HBox[10];
-	VBox[][] columnUp = new VBox[10][10];
+	VBox vBoxPlayFieldDown,vBoxPlayFieldUp,vBoxPlayFieldDivider;
+	HBox[] hBoxRowPlayFieldDown = new HBox[10];
+	VBox[][] columnPlayFieldDown = new VBox[10][10];
+	HBox[] hBoxRowPlayFieldUp = new HBox[10];
+	VBox[][] columnPlayFieldUp = new VBox[10][10];
 	Player me,enemie;
-	Figure[][] bf,bf2;
-	VBox down,up,divider;
+	Figure[][] myBattlefield,enemieBattlefield;
 	InfoText infoText;
 	Label lblInfText = new Label();
 	int[][] kiPlan= new int[10][10];
 	Point kiShootPos = new Point(0,0);
 
 	public Control(VBox down,VBox up, VBox divider){
-		this.down =down;
-		this.up = up;
-		this.divider=divider;
-		this.divider.getChildren().addAll(lblInfText);
-		this.down.setBackground(new Background(new BackgroundImage(new Image("/pictures/background.jpg"), null, null, null, null)));
-		this.up.setBackground(new Background(new BackgroundImage(new Image("/pictures/background.jpg"), null, null, null, null)));
-		me = new Player("test");
+		this.vBoxPlayFieldDown =down;
+		this.vBoxPlayFieldUp = up;
+		this.vBoxPlayFieldDivider=divider;
+		this.vBoxPlayFieldDivider.getChildren().addAll(lblInfText);
+		this.vBoxPlayFieldDown.setBackground(new Background(new BackgroundImage(new Image("/pictures/background.jpg"), null, null, null, null)));
+		this.vBoxPlayFieldUp.setBackground(new Background(new BackgroundImage(new Image("/pictures/background.jpg"), null, null, null, null)));
+		me = new Player("me");
 		enemie= new Player("enemie");
 		infoText = new InfoText(me,enemie) ;
-		bf = me.getBattlefield().getBattlefield();
-		bf2 = enemie.getBattlefield().getBattlefield();
-		for(int i = 0; i<10 ; i++){
-			rowDown[i] = new HBox();
-			rowDown[i].setMinSize(400,40);
-			rowUp[i] = new HBox();
-			rowUp[i].setMinSize(400,40);
-			this.down.getChildren().add(rowDown[i]);
-			this.up.getChildren().add(rowUp[i]);
-			for(int j = 0; j<10 ; j++){
-				columnDown[i][j] = new VBox();
-				columnDown[i][j].setMinSize(40,40);
-				
-				rowDown[i].getChildren().add(columnDown[i][j]);
-				columnUp[i][j] = new VBox();
-				columnUp[i][j].setMinSize(40,40);
-				Figure  f = bf[i][j];
-				Point pos = new Point(i,j);
-				columnUp[i][j].setOnMouseClicked(e -> clickEvent(e,f,pos));
-				columnUp[i][j].setOnMouseEntered(e -> HoverEvent(e,pos, true));
-				columnUp[i][j].setOnMouseExited(e -> HoverEvent(e,pos,false));
-				columnUp[i][j].setPrefHeight(40);
-				columnUp[i][j].setPrefWidth(40);
-				rowUp[i].getChildren().add(columnUp[i][j]);
-			}
-		}
+		myBattlefield = me.getBattlefield().getBattlefield();
+		enemieBattlefield = enemie.getBattlefield().getBattlefield();
+		initializeGui();
 		setColor();
 		setText();
 	     
 		 
 	}
+	private void initializeGui() {
+		for(int rowNr = 0; rowNr<10 ; rowNr++){
+			//create 10 rows with 400 width, 40 height for each PlayField
+			hBoxRowPlayFieldDown[rowNr] = new HBox();
+			hBoxRowPlayFieldDown[rowNr].setMinSize(400,40);
+			hBoxRowPlayFieldUp[rowNr] = new HBox();
+			hBoxRowPlayFieldUp[rowNr].setMinSize(400,40);
+			//give the hole playfield its rows
+			vBoxPlayFieldDown.getChildren().add(hBoxRowPlayFieldDown[rowNr]);
+			vBoxPlayFieldUp.getChildren().add(hBoxRowPlayFieldUp[rowNr]);
+			for(int columnNr = 0; columnNr<10 ; columnNr++){
+				//create 10 columns for each row, with size: 40 width, 40 height
+				columnPlayFieldDown[rowNr][columnNr] = new VBox();
+				columnPlayFieldDown[rowNr][columnNr].setMinSize(40,40);
+				columnPlayFieldUp[rowNr][columnNr] = new VBox();
+				columnPlayFieldUp[rowNr][columnNr].setMinSize(40,40);
+				hBoxRowPlayFieldDown[rowNr].getChildren().add(columnPlayFieldDown[rowNr][columnNr]);
+				hBoxRowPlayFieldUp[rowNr].getChildren().add(columnPlayFieldUp[rowNr][columnNr]);
+				Figure  f = myBattlefield[rowNr][columnNr];
+				Point pos = new Point(rowNr,columnNr);
+				columnPlayFieldUp[rowNr][columnNr].setOnMouseClicked(e -> clickEvent(e,f,pos));
+				columnPlayFieldUp[rowNr][columnNr].setOnMouseEntered(e -> HoverEvent(e,pos, true));
+				columnPlayFieldUp[rowNr][columnNr].setOnMouseExited(e -> HoverEvent(e,pos,false));
+				columnPlayFieldUp[rowNr][columnNr].setPrefHeight(40);
+				columnPlayFieldUp[rowNr][columnNr].setPrefWidth(40);
+				
+			}
+		}
+	}
 	private void HoverEvent(MouseEvent e, Point cord, boolean enter ){
 		if (enter){
-			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null,null)));
+			columnPlayFieldUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null,null)));
 		}else{
-			columnUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID, null, null)));
+			columnPlayFieldUp[cord.x][cord.y].setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID, null, null)));
 		}
 	}
 	
@@ -91,30 +97,30 @@ public class Control {
 		
 		for(int i = 0; i<10 ; i++){
 			for(int j = 0; j<10 ; j++){
-				Figure  f = bf2[i][j];	
-				columnUp[i][j].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
+				Figure  f = enemieBattlefield[i][j];	
+				columnPlayFieldUp[i][j].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
 				if (f== null){
-					columnUp[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
+					columnPlayFieldUp[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
 					
 				}else if (f instanceof Pin){
-					columnUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/whiteFlag.png"), null, null, null, null)));
+					columnPlayFieldUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/whiteFlag.png"), null, null, null, null)));
 				}else{
 					Ship s = ((Ship)f);
 					int picNum = i - s.position.x + j - s.position.y;
 					if(s.isDestroyed()) {
 						if (f instanceof Battleship)
-							columnUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/battleship" + picNum + ".png"), null, null, null, null)));
+							columnPlayFieldUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/battleship" + picNum + ".png"), null, null, null, null)));
 						if (f instanceof Dreadnought)
-							columnUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/dreadnought" + picNum + ".png"), null, null, null, null)));
+							columnPlayFieldUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/dreadnought" + picNum + ".png"), null, null, null, null)));
 						if (f instanceof Destroyer){
-							columnUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/destroyer" + picNum + ".png"), null, null, null, null)));
+							columnPlayFieldUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/destroyer" + picNum + ".png"), null, null, null, null)));
 						}
 						if (f instanceof Submarine)
-							columnUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/submarine" + picNum + ".png"), null, null, null, null)));
-						if (!((Ship)f).isHorizontal()) columnUp[i][j].setRotate(-90);
-						columnUp[i][j].setBackground(new Background(columnUp[i][j].getBackground().getImages().get(0),(new BackgroundImage(new Image("/pictures/hit.png"), null, null, null, null))));
+							columnPlayFieldUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/submarine" + picNum + ".png"), null, null, null, null)));
+						if (!((Ship)f).isHorizontal()) columnPlayFieldUp[i][j].setRotate(-90);
+						columnPlayFieldUp[i][j].setBackground(new Background(columnPlayFieldUp[i][j].getBackground().getImages().get(0),(new BackgroundImage(new Image("/pictures/hit.png"), null, null, null, null))));
 					}else if(s.isHit(new Point(i,j))){
-						columnUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/redFlag.png"), null, null, null, null)));
+						columnPlayFieldUp[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/redFlag.png"), null, null, null, null)));
 					}
 					
 				}
@@ -124,28 +130,28 @@ public class Control {
 		
 		for(int i = 0; i<10 ; i++){
 			for(int j = 0; j<10 ; j++){
-				Figure  f = bf[i][j];	
-				columnDown[i][j].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
+				Figure  f = myBattlefield[i][j];	
+				columnPlayFieldDown[i][j].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
 				if (f== null){
-					columnDown[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
+					columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
 				}else if (f instanceof Pin){
-					columnDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/whiteFlag.png"), null, null, null, null)));
+					columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/whiteFlag.png"), null, null, null, null)));
 				}else{
 					Ship s = ((Ship)f);
 					int picNum = i - s.position.x + j - s.position.y;
 					if(s.isHit(new Point(i,j))){
-						columnDown[i][j].setBackground(new Background(columnDown[i][j].getBackground().getImages().get(0),(new BackgroundImage(new Image("/pictures/hit.png"), null, null, null, null))));
+						columnPlayFieldDown[i][j].setBackground(new Background(columnPlayFieldDown[i][j].getBackground().getImages().get(0),(new BackgroundImage(new Image("/pictures/hit.png"), null, null, null, null))));
 					}else{
 							if (f instanceof Battleship)
-								columnDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/battleship" + picNum + ".png"), null, null, null, null)));
+								columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/battleship" + picNum + ".png"), null, null, null, null)));
 							if (f instanceof Dreadnought)
-								columnDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/dreadnought" + picNum + ".png"), null, null, null, null)));
+								columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/dreadnought" + picNum + ".png"), null, null, null, null)));
 							if (f instanceof Destroyer){
-								columnDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/destroyer" + picNum + ".png"), null, null, null, null)));
+								columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/destroyer" + picNum + ".png"), null, null, null, null)));
 							}
 							if (f instanceof Submarine)
-								columnDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/submarine" + picNum + ".png"), null, null, null, null)));
-							if (!((Ship)f).isHorizontal()) columnDown[i][j].setRotate(-90);
+								columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/submarine" + picNum + ".png"), null, null, null, null)));
+							if (!((Ship)f).isHorizontal()) columnPlayFieldDown[i][j].setRotate(-90);
 					}
 				}
 			
