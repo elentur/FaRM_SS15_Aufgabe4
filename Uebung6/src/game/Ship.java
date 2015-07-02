@@ -19,6 +19,7 @@ public abstract class Ship implements Figure {
 		this.position = position;
 		this.horizontal=horizontal;
 	}
+	public abstract ShipTyp getName();
 	public boolean isHorizontal(){
 		return horizontal;
 	}

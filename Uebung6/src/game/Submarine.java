@@ -14,4 +14,10 @@ public class Submarine  extends Ship{
 		hit = new boolean[2];
 			
 	}
+
+	@Override
+	public ShipTyp getName() {
+		// TODO Auto-generated method stub
+		return ShipTyp.SUBMARINE;
+	}
 }
