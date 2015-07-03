@@ -93,48 +93,32 @@ public class Control {
 	}
 
 	private void setColor() {
-
+		// Enemie PlayField
 		for (int rowNr = 0; rowNr < MAX_PLAYFIELD_NR; rowNr++) {
 			for (int columnNr = 0; columnNr < 10; columnNr++) {
-				Figure f = enemieBattlefield[rowNr][columnNr];
+				Figure enemieFigure = enemieBattlefield[rowNr][columnNr];
 				columnPlayFieldUp[rowNr][columnNr].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
-				if (f == null) {
+				if (enemieFigure == null) {
 					columnPlayFieldUp[rowNr][columnNr].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
 				} else {
-					if (f instanceof Pin) {
+					if (enemieFigure instanceof Pin) {
 						columnPlayFieldUp[rowNr][columnNr].setBackground(new Background(new BackgroundImage(new Image("/pictures/whiteFlag.png"), null, null,
 								null, null)));
 
-					} else if (f instanceof Ship) {
+					} else if (enemieFigure instanceof Ship) {
 
 						Ship s = ((Ship) enemieBattlefield[rowNr][columnNr]);
 						ShipTyp type = s.getName();
 						int picNum = rowNr - s.position.x + columnNr - s.position.y;
 						if (s.isDestroyed()) {
-
-							switch (type) {
-							case BATTLESHIP:
-								columnPlayFieldUp[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
-								break;
-							case DREADNOUGHT:
-								columnPlayFieldUp[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
-								break;
-							case DESTROYER:
-								columnPlayFieldUp[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
-								break;
-							case SUBMARINE:
-								columnPlayFieldUp[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
-								break;
-							default:
-								break;
-							}
+							setDestroyedImages(columnPlayFieldUp, type, rowNr, columnNr, picNum);
 							if (!s.isHorizontal())
 								columnPlayFieldUp[rowNr][columnNr].setRotate(-90);
-								columnPlayFieldUp[rowNr][columnNr].setBackground(new Background(columnPlayFieldUp[rowNr][columnNr].getBackground().getImages()
+							columnPlayFieldUp[rowNr][columnNr].setBackground(new Background(columnPlayFieldUp[rowNr][columnNr].getBackground().getImages()
 									.get(0), (new BackgroundImage(new Image("/pictures/hit.png"), null, null, null, null))));
 						} else if (s.isHit(new Point(rowNr, columnNr))) {
-									columnPlayFieldUp[rowNr][columnNr].setBackground(new Background(new BackgroundImage(new Image("/pictures/redFlag.png"), null, null,
+							columnPlayFieldUp[rowNr][columnNr].setBackground(new Background(new BackgroundImage(new Image("/pictures/redFlag.png"), null, null,
 									null, null)));
 						}
 					}
@@ -142,41 +126,51 @@ public class Control {
 
 			}
 		}
-
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				Figure f = myBattlefield[i][j];
-				columnPlayFieldDown[i][j].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
-				if (f == null) {
-					columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-				} else if (f instanceof Pin) {
-					columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/whiteFlag.png"), null, null, null, null)));
+		// My PlayField
+		for (int rowNr = 0; rowNr < MAX_PLAYFIELD_NR; rowNr++) {
+			for (int columnNr = 0; columnNr < 10; columnNr++) {
+				Figure myFigure = myBattlefield[rowNr][columnNr];
+				columnPlayFieldDown[rowNr][columnNr].setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, null)));
+				if (myFigure == null) {
+					columnPlayFieldDown[rowNr][columnNr].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+				} else if (myFigure instanceof Pin) {
+					columnPlayFieldDown[rowNr][columnNr].setBackground(new Background(new BackgroundImage(new Image("/pictures/whiteFlag.png"), null, null,
+							null, null)));
 				} else {
-					Ship s = ((Ship) f);
-					int picNum = i - s.position.x + j - s.position.y;
-					if (s.isHit(new Point(i, j))) {
-						columnPlayFieldDown[i][j].setBackground(new Background(columnPlayFieldDown[i][j].getBackground().getImages().get(0),
-								(new BackgroundImage(new Image("/pictures/hit.png"), null, null, null, null))));
+					Ship s = ((Ship) myFigure);
+					int picNum = rowNr - s.position.x + columnNr - s.position.y;
+					if (s.isHit(new Point(rowNr, columnNr))) {
+						columnPlayFieldDown[rowNr][columnNr].setBackground(new Background(columnPlayFieldDown[rowNr][columnNr].getBackground().getImages()
+								.get(0), (new BackgroundImage(new Image("/pictures/hit.png"), null, null, null, null))));
 					} else {
-						if (f instanceof Battleship)
-							columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/battleship" + picNum + ".png"),
-									null, null, null, null)));
-						if (f instanceof Dreadnought)
-							columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/dreadnought" + picNum + ".png"),
-									null, null, null, null)));
-						if (f instanceof Destroyer) {
-							columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/destroyer" + picNum + ".png"),
-									null, null, null, null)));
-						}
-						if (f instanceof Submarine)
-							columnPlayFieldDown[i][j].setBackground(new Background(new BackgroundImage(new Image("/pictures/submarine" + picNum + ".png"),
-									null, null, null, null)));
-						if (!((Ship) f).isHorizontal())
-							columnPlayFieldDown[i][j].setRotate(-90);
+						ShipTyp type = s.getName();
+						setDestroyedImages(columnPlayFieldDown, type, rowNr, columnNr, picNum);
+						if (!((Ship) myFigure).isHorizontal())
+							columnPlayFieldDown[rowNr][columnNr].setRotate(-90);
 					}
 				}
 
 			}
+		}
+
+	}
+
+	private void setDestroyedImages(VBox[][] columnPlayField, ShipTyp type, int rowNr, int columnNr, int picNum) {
+		switch (type) {
+		case BATTLESHIP:
+			columnPlayField[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
+			break;
+		case DREADNOUGHT:
+			columnPlayField[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
+			break;
+		case DESTROYER:
+			columnPlayField[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
+			break;
+		case SUBMARINE:
+			columnPlayField[rowNr][columnNr].setBackground(type.getImageBackground(picNum));
+			break;
+		default:
+			break;
 		}
 
 	}
