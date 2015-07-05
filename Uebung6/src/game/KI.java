@@ -1,42 +1,39 @@
 package game;
 
 import java.awt.Point;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Random;
 
-import javafx.application.Platform;
 
 public class KI implements Runnable, Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private  int[][] kiPlan= new int[10][10];
 	private  Point kiShootPos = new Point(0,0);
 	private  Ship kiHitShip;
 	private  Random rnd = new Random();
-	private Player me;
-	private InfoText infoText;
-	private Control ctrl;
-	
-	public KI(Player me, InfoText infoText, Control ctrl){
-		this.me = me;
-		this.infoText=infoText;
-		this.ctrl=ctrl;
-	}
+	private PlayingField playingField;
+
 	@Override
 	
 public void run() {
 		while(true){
-			try {Thread.sleep(2000);} 
-			catch (InterruptedException e) {}
-			me= IOSystem.readFile(me);
-			if(!me.isTurn()){
-				shootKI();
-				infoText.setLap(infoText.getLap()+1);
-				
-				//schreibe meinen spielenstand
-				me.setTurn(true);
-				IOSystem.writeFile(me);
-				//lade das Spiel vom Gegner fÃ¼r meinen nÃ¤chsten Zug
+			
+			try {
+				if(	!Mutex.mutex)playingField= IOSystem.readFile();
+				if(playingField.getPlayerTwo().isTurn()){
+					shootKI();
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				System.out.println("KI lesefehler"
+						+ Mutex.mutex);
 			}
+			
 		}	
 }
 
@@ -54,7 +51,7 @@ public void shootKI(){
 				
 					//wenn auf das Feld noch nicht geschossen wurde
 					if(kiPlan[pos.x][pos.y] == 0){
-						hit =me.getBattlefield().shoot(pos);
+						hit =playingField.shoot(pos);
 						setKIPlanFlag(pos);
 						
 					}else if(kiPlan[pos.x][pos.y] == -1){//wenn das aktuelle feld eine Nite ist
@@ -62,7 +59,7 @@ public void shootKI(){
 					}else{
 						//wenn zuvor auf ein schiff geschossen habe
 						//wandere das schiff in schifsrichtung vorne eins weiter und schiese erneut
-						Ship s = ((Ship)me.getBattlefield().getBattlefield()[pos.x][pos.y]);
+						Ship s = ((Ship)playingField.getBattlefieldOne()[pos.x][pos.y]);
 						if (!s.isDestroyed()){
 							setKIPlanNextPos(pos,s);
 							
@@ -74,15 +71,14 @@ public void shootKI(){
 						}
 						
 					}
-			/*pos.x = rnd.nextInt(10);
-			pos.y = rnd.nextInt(10);
-			hit =me.getBattlefield().shoot(pos);*/
 		}
 		kiShootPos.x = pos.x;
 		kiShootPos.y = pos.y;
 			
 	}
 	private  void setKIPlanNextPos(Point pos,Ship s) {
+		try {Thread.sleep(400);} 
+		catch (InterruptedException e) {}
 		if (s.isHorizontal() ){
 			if (pos.x +1 <10){
 				pos.x++;
@@ -118,6 +114,8 @@ public void shootKI(){
 				for(int i = 0; i < kiHitShip.getSize(); i++){
 					if(kiHitShip.hit[i]){
 						pos.x = kiHitShip.getPosition().x +i-1;
+						try {Thread.sleep(700);} 
+						catch (InterruptedException e) {}
 						break;
 					}	
 				}
@@ -125,22 +123,30 @@ public void shootKI(){
 				for(int i = 0; i < kiHitShip.getSize(); i++){
 					if(kiHitShip.hit[i]){
 						pos.y = kiHitShip.getPosition().y+i-1;
+						try {Thread.sleep(700);} 
+						catch (InterruptedException e) {}
 						break;
 					}
 				}
 			}
 		}else{
-			// sonnst suche in der umgebung ein schiff
+			// sonst suche in der umgebung ein schiff
+			try {Thread.sleep(300);} 
+			catch (InterruptedException e) {}
 			pos.x += -2 + rnd.nextInt(4);
 			pos.y += -2 + rnd.nextInt(4);
 		}
 		
 	}
 	private  void setKIPlanFlag(Point pos) {
-		if (me.getBattlefield().getBattlefield()[pos.x][pos.y] instanceof Ship){
+		if (playingField.getBattlefieldOne()[pos.x][pos.y] instanceof Ship){
 			kiPlan[pos.x][pos.y] =1;
-			kiHitShip = ((Ship)me.getBattlefield().getBattlefield()[pos.x][pos.y]);
+			kiHitShip = ((Ship)playingField.getBattlefieldOne()[pos.x][pos.y]);
+			try {Thread.sleep(300);} 
+			catch (InterruptedException e) {}
 		}else{
+			try {Thread.sleep(200);} 
+			catch (InterruptedException e) {}
 			kiPlan[pos.x][pos.y] =-1;
 		}
 	}

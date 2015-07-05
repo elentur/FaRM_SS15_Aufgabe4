@@ -3,10 +3,6 @@ package game;
 import java.awt.Point;
 import java.io.Serializable;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import exception.WrongPlaceException;
-
 public class PlayingField implements Serializable{
 
 	/**
@@ -14,60 +10,27 @@ public class PlayingField implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Figure[][]  battlefield;
-		
+	private Figure[][]  battlefieldOne;
+	private Figure[][]  battlefieldTwo;
+	private Player playerOne;
+	private Player playerTwo;
 	public PlayingField(){
-		battlefield = new Figure[10][10];
-		
+		battlefieldOne = new Figure[10][10];
+		battlefieldTwo = new Figure[10][10];
+		playerOne = new Player("Spieler",battlefieldOne,battlefieldTwo);
+		playerTwo = new Player("KI",battlefieldTwo,battlefieldOne);
 	}
-	
-	
-	public void  addShip(Ship ship) throws WrongPlaceException{
-		for(int i = 0; i <ship.getSize();i++ ){
-			if(ship.isHorizontal()){
-				if(battlefield[ship.getPosition().x+i][ship.getPosition().y]!=null){
-					throw new WrongPlaceException();
-				}else if(ship.getPosition().y-1 >= 0 && battlefield[ship.getPosition().x+i][ship.getPosition().y-1]!=null){
-					throw new WrongPlaceException();
-				}else if(ship.getPosition().y+1 < 10 && battlefield[ship.getPosition().x+i][ship.getPosition().y+1]!=null){
-					throw new WrongPlaceException();
-				}else if(ship.getPosition().x+1 < 10 && battlefield[ship.getPosition().x+i+1][ship.getPosition().y]!=null){
-					throw new WrongPlaceException();
-				}else if(i == 0 && ship.getPosition().x-1 >= 0 && battlefield[ship.getPosition().x+i-1][ship.getPosition().y]!=null){
-					throw new WrongPlaceException();
-				}
-				
-			}else if(!ship.isHorizontal()){
-				if(battlefield[ship.getPosition().x][ship.getPosition().y+i]!=null){
-					throw new WrongPlaceException();
-				}else if(ship.getPosition().x-1 >= 0 && battlefield[ship.getPosition().x-1][ship.getPosition().y+i]!=null){
-					throw new WrongPlaceException();
-				}else if(ship.getPosition().x+1 < 10 && battlefield[ship.getPosition().x+1][ship.getPosition().y+i]!=null){
-					throw new WrongPlaceException();
-				}else if(ship.getPosition().y+1 < 10 && battlefield[ship.getPosition().x][ship.getPosition().y+i+1]!=null){
-					throw new WrongPlaceException();
-				}else if(i == 0 && ship.getPosition().y-1 >= 0 && battlefield[ship.getPosition().x][ship.getPosition().y+i-1]!=null){
-					throw new WrongPlaceException();
-				}
-				
-			}
-				
-		}
 
-		for(int i = 0; i <ship.getSize();i++ ){
-			if(ship.isHorizontal()){
-				battlefield[ship.getPosition().x+i][ship.getPosition().y]=ship;
-			}else if(!ship.isHorizontal()){
-				battlefield[ship.getPosition().x][ship.getPosition().y+i]= ship;
-			}else{
-				throw new WrongPlaceException();
-			}
-				
-		}
-	}
 	
 	public void print(){
-
+		Figure[][]  battlefield;
+		for (int n = 0; n<2;n++){
+			
+			if (n==0){
+				battlefield = battlefieldOne;
+			}else{
+				battlefield = battlefieldTwo;
+			}
 		for (int i = 0; i <10; i++){
 			for (int j = 0; j <10; j++){
 				if(battlefield[i][j] == null) System.out.print("0 ");
@@ -76,11 +39,18 @@ public class PlayingField implements Serializable{
 			System.out.println();
 		}
 		System.out.println();
+		}
 	}
 	public boolean  shoot(Point pos){
+		Figure[][]	battlefield;
+		if (playerOne.isTurn()){
+			battlefield = battlefieldTwo;
+		}else{
+			battlefield = battlefieldOne;
+		}
+		
 		if(battlefield[pos.x][pos.y]== null){
 			battlefield[pos.x][pos.y] = new Pin();
-			return true;
 		}else if(battlefield[pos.x][pos.y] instanceof Ship ){
 			Ship ship = (Ship)battlefield[pos.x][pos.y];
 			if(!ship.hitShip(pos)  ){
@@ -90,9 +60,25 @@ public class PlayingField implements Serializable{
 			return false;
 		}
 		
+		playerOne.setTurn(!playerOne.isTurn());
+		playerTwo.setTurn(!playerTwo.isTurn());
+		
+		Mutex.setMutex(true);
+			IOSystem.writeFile(this);
+		Mutex.setMutex(false);
+		
 		return true;
 	}
-	public Figure[][] getBattlefield(){
-		return battlefield;
+	public Figure[][] getBattlefieldOne(){
+		return battlefieldOne;
+	}
+	public Figure[][] getBattlefieldTwo(){
+		return battlefieldTwo;
+	}
+	public Player getPlayerOne(){
+		return playerOne;
+	}
+	public Player getPlayerTwo(){
+		return playerTwo;
 	}
 }
