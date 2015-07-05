@@ -64,6 +64,7 @@ public class Control {
 			playingField.getPlayerOne().setTurn(true);
 		}
 		try {
+			
 			playingField = IOSystem.readFile();
 		} catch (ClassNotFoundException | IOException e) {
 			IOSystem.writeFile(playingField);
