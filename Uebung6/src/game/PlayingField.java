@@ -14,32 +14,43 @@ public class PlayingField implements Serializable{
 	private Figure[][]  battlefieldTwo;
 	private Player playerOne;
 	private Player playerTwo;
-	public PlayingField(){
+	private boolean testMode;
+	
+	public PlayingField( boolean testMode){
 		battlefieldOne = new Figure[10][10];
 		battlefieldTwo = new Figure[10][10];
 		playerOne = new Player("Spieler",battlefieldOne,battlefieldTwo);
 		playerTwo = new Player("KI",battlefieldTwo,battlefieldOne);
+		this.testMode=testMode;
 	}
 
 	
-	public void print(){
+	public String print(){
 		Figure[][]  battlefield;
+		String s="";
 		for (int n = 0; n<2;n++){
-			
 			if (n==0){
 				battlefield = battlefieldOne;
 			}else{
 				battlefield = battlefieldTwo;
 			}
-		for (int i = 0; i <10; i++){
-			for (int j = 0; j <10; j++){
-				if(battlefield[i][j] == null) System.out.print("0 ");
-				else System.out.print(((Ship)battlefield[i][j]).getSize() + " ");
+			for (int i = 0; i <10; i++){
+				for (int j = 0; j <10; j++){
+					if(battlefield[j][i] == null){
+						s= s+("0 ");
+					}else if(battlefield[j][i] instanceof Pin){
+						s= s+("W ");
+					}else if(((Ship)battlefield[j][i]).isHit(new Point(j,i))){
+						s= s+("R ");
+					}else{
+						s= s+(((Ship)battlefield[j][i]).getSize() + " ");
+					}
+				}
+				s=s+"\r\n";
 			}
-			System.out.println();
+			s=s+"\r\n";
 		}
-		System.out.println();
-		}
+		return s;
 	}
 	public boolean  shoot(Point pos){
 		Figure[][]	battlefield;
@@ -62,11 +73,16 @@ public class PlayingField implements Serializable{
 		
 		playerOne.setTurn(!playerOne.isTurn());
 		playerTwo.setTurn(!playerTwo.isTurn());
-		
+		checkVictory();
 		Mutex.setMutex(true);
 			IOSystem.writeFile(this);
+			if(testMode){
+				IOSystem.writeTurnMap(this);
+				System.out.println(print());
+				System.exit(0);
+			}
 		Mutex.setMutex(false);
-		
+	
 		return true;
 	}
 	public Figure[][] getBattlefieldOne(){
@@ -80,5 +96,23 @@ public class PlayingField implements Serializable{
 	}
 	public Player getPlayerTwo(){
 		return playerTwo;
+	}
+	private void checkVictory(){
+		int ships =10;
+		for (int i=0 ; i<10;i++){
+			if(playerOne.getShips().get(i).isDestroyed())ships--;
+		}
+		if (ships ==0){
+			System.out.println(playerTwo.getName() + " hat das Spiel gewonnen.");
+			System.exit(0);
+		}
+		ships =10;
+		for (int i=0 ; i<10;i++){
+			if(playerTwo.getShips().get(i).isDestroyed())ships--;
+		}
+		if (ships ==0){
+			System.out.println(playerOne.getName() + " hat das Spiel gewonnen.");
+			System.exit(0);
+		}
 	}
 }

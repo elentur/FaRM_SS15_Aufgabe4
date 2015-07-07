@@ -7,6 +7,8 @@ import java.awt.Point;
 import java.io.IOException;
 
 
+import java.util.Random;
+
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -32,7 +34,7 @@ public class Control {
 	PlayingField playingField;
 	Figure[][] bfUp,bfDown;
 	VBox down,up,divider;
-	InfoText infoText = new InfoText();
+	InfoText infoText;
 	Label lblInfText = new Label();
 	Thread KIThread;
 	Thread colorRefresh;
@@ -40,6 +42,7 @@ public class Control {
 	Point mousePoint = new Point(-1,-1);
 	Color bgStrokeColor;
 	boolean hostPlayer;
+	boolean testMode;
 	BackgroundImage[] imgBattleship= new BackgroundImage[5];
 	BackgroundImage[] imgDreadnought= new BackgroundImage[4];
 	BackgroundImage[] imgDestroyer= new BackgroundImage[3];
@@ -49,27 +52,32 @@ public class Control {
 	BackgroundImage imgHit;
 	
 	
-	public Control(VBox down,VBox up, VBox divider){
+	public Control(VBox down,VBox up, VBox divider,boolean testMode){
 		this.down =down;
 		this.up = up;
 		this.divider=divider;
 		this.divider.getChildren().addAll(lblInfText);
+		this.testMode=testMode;
 		initGame();	 
 	}
 	
 	private void initGame() {
 		hostPlayer = true;// Muss eigentlich bei Wahl von host oder Client gesetzt werden
-		playingField = new PlayingField();
-		if(hostPlayer){
-			playingField.getPlayerOne().setTurn(true);
-		}
+		
+		
 		try {
 			
 			playingField = IOSystem.readFile();
 		} catch (ClassNotFoundException | IOException e) {
+			playingField = new PlayingField(testMode);
+			if(hostPlayer){
+				playingField.getPlayerOne().setTurn(true);
+			}
 			IOSystem.writeFile(playingField);
 			//Falls es noch kein Spiel gibt oder es Fehlerhaft ist, schreib ein neues
 		}
+		 infoText = new InfoText(playingField.getPlayerOne(),playingField.getPlayerTwo());
+		 
 		createGUIGrid();	
 		loadImageBuffer();
 		KIThread = new Thread(new KI());
@@ -82,11 +90,16 @@ public class Control {
 					try {
 						Thread.sleep(1000);
 						if(!Mutex.mutex)playingField = IOSystem.readFile();
+						if(testMode)shootRandom();
+						infoText.setShip1(playingField.getPlayerOne().getShips());
+						infoText.setShip2(playingField.getPlayerTwo().getShips());
 					} catch (ClassNotFoundException |InterruptedException| IOException e) {
 						System.out.println("Spieler lesefehler");
 					}
 				}		
-			}});
+			}
+
+			});
 		readGame.setDaemon(true);
 		readGame.start();
 		
@@ -96,24 +109,40 @@ public class Control {
 				while (true){
 					try {
 						Thread.sleep(50);
-					} catch (InterruptedException e) {
-					}
-					Platform.runLater(new Runnable(){
-						@Override
-						public void run() {
-							refreshColor();
-							infoText.setWaiting(!isAktivPlayersTurn());
-							setText();
-						}
 						
-					});
+							Platform.runLater(new Runnable(){
+							@Override
+							public void run() {
+								refreshColor();
+								infoText.setWaiting(!isAktivPlayersTurn());
+								setText();
+							}
+						
+							});
+					} catch (InterruptedException e) {
+						System.out.println("Spieler lesefehler");
+					}
+					
 				}}});
 		colorRefresh.setDaemon(true);
 		colorRefresh.start();
 	}
 	
 
-
+	private void shootRandom(){
+	Random rnd = new Random();
+	Point pos = new Point();
+		while(true){
+			if(isAktivPlayersTurn()){
+				infoText.setMsg("");
+				pos.x=rnd.nextInt(10);
+				pos.y=rnd.nextInt(10);
+				playingField.shoot(pos);
+	
+				
+			}
+		}
+	}
 	private void createGUIGrid() {
 		for(int i = 0; i<10 ; i++){
 			rowDown[i] = new HBox();
@@ -138,7 +167,7 @@ public class Control {
 				columnUp[i][j].setOnMouseEntered(e -> HoverEvent(e,pos));
 				rowUp[i].getChildren().add(columnUp[i][j]);
 			}
-		}	
+		}
 	}
 	
 	private void loadImageBuffer() {
@@ -163,14 +192,13 @@ public class Control {
 	}
 	
 	public void refreshColor(){
-	
 		bfUp 			= playingField.getBattlefieldTwo();
 		bfDown			= playingField.getBattlefieldOne();
 		bgStrokeColor 	= Color.BLACK;
-		
+		Figure  f;
 		for(int i = 0; i<10 ; i++){
 			for(int j = 0; j<10 ; j++){
-				Figure  f = bfUp[i][j];	
+				 f = bfUp[i][j];	
 				columnUp[i][j].setBorder(new Border(new BorderStroke(bgStrokeColor, BorderStrokeStyle.SOLID, null, null)));
 				if(isAktivPlayersTurn()&& i == mousePoint.x && j == mousePoint.y)columnUp[i][j].setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null,new BorderWidths(5))));
 
@@ -199,11 +227,12 @@ public class Control {
 					
 				}			
 			}
+			
 		}
 		
 		for(int i = 0; i<10 ; i++){
 			for(int j = 0; j<10 ; j++){
-				Figure  f = bfDown[i][j];	
+				f = bfDown[i][j];	
 				columnDown[i][j].setBorder(new Border(new BorderStroke(bgStrokeColor, BorderStrokeStyle.SOLID, null, null)));
 				if (f== null){
 					columnDown[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
@@ -213,7 +242,15 @@ public class Control {
 					Ship s = ((Ship)f);
 					int picNum = i - s.position.x + j - s.position.y;
 					if(s.isHit(new Point(i,j))){
-						columnDown[i][j].setBackground(new Background(columnDown[i][j].getBackground().getImages().get(0),(imgHit)));
+						if (f instanceof Battleship)
+							columnDown[i][j].setBackground(new Background(imgBattleship[picNum],imgHit));
+						if (f instanceof Dreadnought)
+							columnDown[i][j].setBackground(new Background(imgDreadnought[picNum],imgHit));
+						if (f instanceof Destroyer)
+							columnDown[i][j].setBackground(new Background(imgDestroyer[picNum],imgHit));
+						if (f instanceof Submarine)
+							columnDown[i][j].setBackground(new Background(imgSubmarine[picNum],imgHit));
+						if (!((Ship)f).isHorizontal()) columnDown[i][j].setRotate(-90);
 					}else{
 							if (f instanceof Battleship)
 								columnDown[i][j].setBackground(new Background(imgBattleship[picNum]));
@@ -229,7 +266,6 @@ public class Control {
 			
 			}
 		}
-		
 	}
 	
 	public void setText(){
@@ -245,6 +281,7 @@ public class Control {
 					setText();
 					return;
 				}	
+				
 			}
 		}	
 	}
@@ -253,22 +290,7 @@ public class Control {
 		return (hostPlayer && playingField.getPlayerOne().isTurn())||(!hostPlayer && playingField.getPlayerTwo().isTurn());
 	}
 	
-	private void checkVictory(Player player){
-	/*	if (player == me){
-			infoText.setShip1(10);
-			for(int i = 0; i<player.getShips().size() ; i++){
-				if (player.getShips().get(i).isDestroyed() ) infoText.setShip1(infoText.getShip1()-1);
-			}
-			if(infoText.getShip1() == 0)	infoText.setMsg(enemie.getName() + " hat gewonnen.");
-		}else{
-			infoText.setShip2(10);
-			for(int i = 0; i<player.getShips().size() ; i++){
-				if (player.getShips().get(i).isDestroyed() ) infoText.setShip2(infoText.getShip2()-1);
-			}
-			if(infoText.getShip2() == 0)	infoText.setMsg(me.getName() + " hat gewonnen.");
-		}
-		setText();*/
-	}
+	
 	
 	
 	

@@ -9,12 +9,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class startGUI extends Application {
-
+	private static  boolean testMode =false;
 	@Override
 	public void start(Stage primaryStage) {
 		VBox root = new VBox();
 		VBox oben= new VBox(), unten = new VBox();
 		VBox trenner = new VBox();
+		
 		
 		
 		root.getChildren().addAll(unten,trenner,oben);
@@ -23,20 +24,17 @@ public class startGUI extends Application {
 		oben.prefWidthProperty().bind(scene.widthProperty());
 		unten.prefHeightProperty().bind(scene.widthProperty());
 		unten.prefWidthProperty().bind(scene.widthProperty());
-		//trenner.minHeightProperty().bind(scene.heightProperty().divide(12));
 		trenner.setMinHeight(70);
 		trenner.setMaxHeight(70);
 		primaryStage.setScene(scene);
-		new Control(oben,unten, trenner);
-		
-		primaryStage.show();
-		//primaryStage.setResizable(false);
-		//primaryStage.setMaxWidth(400);
+		new Control(oben,unten, trenner,testMode);		
+		if(!testMode)primaryStage.show();
 		primaryStage.maxHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(110.0));
 		primaryStage.minHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(110.0));
 	}
 
 	public static void main(String[] args) {
+		if(args[0].equals("true") )testMode=true; 
 		launch(args);
 	}
 }

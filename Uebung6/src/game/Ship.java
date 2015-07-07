@@ -48,12 +48,12 @@ public abstract class Ship implements Figure {
 		if (hit[index]) return false;
 		hit[index]=true;
 		destroyed = true;
-		for ( int i = 0; i < size; i++)
+		for ( int i = 0; i < size; i++){
 			if (!hit[i]){
 				destroyed = false;
-				continue;
 
 			}
+		}
 		return true;
 	}
 }

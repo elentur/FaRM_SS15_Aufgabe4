@@ -1,5 +1,7 @@
 package game;
 
+import java.util.List;
+
 public class InfoText implements Figure {
 
 	/**
@@ -54,22 +56,28 @@ public class InfoText implements Figure {
 
 
 
-	public void setShip1(int ship1) {
-		this.ship1 = ship1;
+	public void setShip1(List<Ship> ship1) {
+		this.ship1 = 10;
+		for (int i=0 ; i<10;i++){
+			if(ship1.get(i).isDestroyed())this.ship1--;
+		}
 	}
 
 
 
 
 	public int getShip2() {
-		return ship2;
+		return this.ship2;
 	}
 
 
 
 
-	public void setShip2(int ship2) {
-		this.ship2 = ship2;
+	public void setShip2(List<Ship> ship2) {
+		this.ship2 = 10;
+		for (int i=0 ; i<10;i++){
+			if(ship2.get(i).isDestroyed())this.ship2--;
+		}
 	}
 
 
@@ -92,8 +100,8 @@ public class InfoText implements Figure {
 	public  String info(){
 		
 			
-			//return 	"Runde: " +lap + "\n" + p1.getName() +"s Schiffe: " + ship1 + "\n" + p2.getName() +"s Schiffe: " + ship2 + "\n" + msg;
-			return  msg + " " + waitingMsg;
+			return 	"Runde: " +lap + "\n" + p1.getName() +"s Schiffe: " + ship1 + "\n" + p2.getName() +"s Schiffe: " + ship2 + "\n" + msg + " " + waitingMsg;
+			//return  msg + " " + waitingMsg;
 
 		
 	}
