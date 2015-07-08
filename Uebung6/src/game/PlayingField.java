@@ -19,8 +19,8 @@ public class PlayingField implements Serializable{
 	public PlayingField( boolean testMode){
 		battlefieldOne = new Figure[10][10];
 		battlefieldTwo = new Figure[10][10];
-		playerOne = new Player("Spieler",battlefieldOne,battlefieldTwo);
-		playerTwo = new Player("KI",battlefieldTwo,battlefieldOne);
+		playerOne = new Player("Spieler",battlefieldOne);
+		playerTwo = new Player("KI",battlefieldTwo);
 		this.testMode=testMode;
 	}
 
@@ -52,6 +52,7 @@ public class PlayingField implements Serializable{
 		}
 		return s;
 	}
+	
 	public boolean  shoot(Point pos){
 		Figure[][]	battlefield;
 		if (playerOne.isTurn()){

@@ -34,7 +34,8 @@ public class startGUI extends Application {
 	}
 
 	public static void main(String[] args) {
-		if(args[0].equals("true") )testMode=true; 
+		//if(args[0].equals("true") )
+		testMode=false; 
 		launch(args);
 	}
 }

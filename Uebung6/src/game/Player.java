@@ -13,17 +13,16 @@ public class Player implements Serializable{
 	private static final int MAX_SHIP_TYP_NUMBER = 5;
 	private String name;
 	private boolean turn;
-	private Figure[][] myBattlefield, enemiesBattlefield;
+	private Figure[][] myBattlefield;
 	private List<Ship> ships = new ArrayList<Ship>();
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public Player(String name,Figure[][] myBattlefield,Figure[][] enemiesBattlefield){
+	public Player(String name,Figure[][] myBattlefield){
 		this.name = name;
 		this.myBattlefield=myBattlefield;
-		this.enemiesBattlefield = enemiesBattlefield;
 		//my field where i save my ships, but not playing with it
 		createShipsAndPlaceThem();
 	}
