@@ -2,6 +2,7 @@ package game;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.net.Socket;
 
 public class PlayingField implements Serializable{
 
@@ -14,16 +15,17 @@ public class PlayingField implements Serializable{
 	private Figure[][]  battlefieldTwo;
 	private Player playerOne;
 	private Player playerTwo;
-	private boolean testMode;
+
 	
-	public PlayingField( boolean testMode){
+	public PlayingField(){
 		battlefieldOne = new Figure[10][10];
 		battlefieldTwo = new Figure[10][10];
 		playerOne = new Player("Spieler",battlefieldOne,battlefieldTwo);
 		playerTwo = new Player("KI",battlefieldTwo,battlefieldOne);
-		this.testMode=testMode;
-	}
 
+		
+	}
+	
 	
 	public String print(){
 		Figure[][]  battlefield;
@@ -76,11 +78,6 @@ public class PlayingField implements Serializable{
 		checkVictory();
 		Mutex.setMutex(true);
 			IOSystem.writeFile(this);
-			if(testMode){
-				IOSystem.writeTurnMap(this);
-				System.out.println(print());
-				System.exit(0);
-			}
 		Mutex.setMutex(false);
 	
 		return true;
@@ -98,7 +95,7 @@ public class PlayingField implements Serializable{
 		return playerTwo;
 	}
 	private void checkVictory(){
-		int ships =10;
+		int ships = 10;
 		for (int i=0 ; i<10;i++){
 			if(playerOne.getShips().get(i).isDestroyed())ships--;
 		}

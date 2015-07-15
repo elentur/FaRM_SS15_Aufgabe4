@@ -2,6 +2,7 @@ package game;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,12 +16,14 @@ public class Player implements Serializable{
 	private boolean turn;
 	private Figure[][] myBattlefield, enemiesBattlefield;
 	private List<Ship> ships = new ArrayList<Ship>();
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public Player(String name,Figure[][] myBattlefield,Figure[][] enemiesBattlefield){
+	public Player(String name,
+			Figure[][] myBattlefield,Figure[][] enemiesBattlefield){
 		this.name = name;
 		this.myBattlefield=myBattlefield;
 		this.enemiesBattlefield = enemiesBattlefield;
@@ -28,6 +31,7 @@ public class Player implements Serializable{
 		createShipsAndPlaceThem();
 	}
 	
+
 	public String getName(){
 		return name;
 	}

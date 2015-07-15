@@ -1,40 +1,103 @@
 package game;
 
+
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.TableView;
+import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class startGUI extends Application {
-	private static  boolean testMode =false;
+	VBox root = new VBox();
+	VBox oben= new VBox(), unten = new VBox();
+	VBox trenner = new VBox();
+	VBox root2 = new VBox(50);
+	Scene scene = new Scene(root, 400,900);
+	Scene startScreen = new Scene(root2,400,600);
+	Stage primaryStage; 
 	@Override
 	public void start(Stage primaryStage) {
-		VBox root = new VBox();
-		VBox oben= new VBox(), unten = new VBox();
-		VBox trenner = new VBox();
+
+		this.primaryStage = primaryStage;
 		
 		
 		
-		root.getChildren().addAll(unten,trenner,oben);
-		Scene scene = new Scene(root, 400,900);
+		
+		Button btnSinglePlayer = new Button("Singleplayer");
+		btnSinglePlayer.setPrefSize(250,80);
+		btnSinglePlayer.setOnAction(e->{startGame(true);});
+		Button btnHost = new Button("Spiel Hosten");
+		btnHost.setPrefSize(250,80);
+		btnHost.setOnAction(e->{ConnectScreen(true);});
+		Button btnClient = new Button("mit Spiel verbinden");
+		btnClient.setPrefSize(250,80);
+		btnClient.setOnAction(e->{ConnectScreen(false);});
+		Button btnLoad = new Button("altes Spiel laden");
+		btnLoad.setPrefSize(250,80);
+		btnLoad.setOnAction(e->{startGame(false);});
+		
+		root2.getChildren().addAll(btnSinglePlayer,btnHost,btnClient,btnLoad);
+		root2.setAlignment(Pos.CENTER);
+		
+		primaryStage.setScene(startScreen);
+				
+		primaryStage.show();
+		
+	}
+
+	private void ConnectScreen(boolean i) {
+		if(i){
+			try {
+				ServerSocket serverSocket = new ServerSocket(50000);
+				Socket socketClient =  serverSocket.accept();
+				new Control(oben,unten, trenner,true,false,socketClient);	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				Socket socket = new Socket("127.0.0.1",50000);
+				new Control(oben,unten, trenner,false,false,socket);	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		loadScene();
+	}
+
+	private void startGame(boolean i) {
+		if(i){
+			new Control(oben,unten, trenner,true,false,null);	
+		}else{
+			new Control(oben,unten, trenner,true,true,null);	
+		}
+		loadScene();
+		
+	}
+
+	private void loadScene() {
+		primaryStage.setScene(scene);
 		oben.prefHeightProperty().bind(scene.widthProperty());
 		oben.prefWidthProperty().bind(scene.widthProperty());
 		unten.prefHeightProperty().bind(scene.widthProperty());
 		unten.prefWidthProperty().bind(scene.widthProperty());
 		trenner.setMinHeight(70);
 		trenner.setMaxHeight(70);
-		primaryStage.setScene(scene);
-		new Control(oben,unten, trenner,testMode);		
-		if(!testMode)primaryStage.show();
+		root.getChildren().addAll(unten,trenner,oben);
 		primaryStage.maxHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(110.0));
 		primaryStage.minHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(110.0));
+		
 	}
 
 	public static void main(String[] args) {
-		if(args[0].equals("true") )testMode=true; 
 		launch(args);
 	}
 }

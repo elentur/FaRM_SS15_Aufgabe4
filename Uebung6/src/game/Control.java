@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.io.IOException;
 
 
+import java.net.Socket;
 import java.util.Random;
 
 import javafx.application.Platform;
@@ -42,7 +43,7 @@ public class Control {
 	Point mousePoint = new Point(-1,-1);
 	Color bgStrokeColor;
 	boolean hostPlayer;
-	boolean testMode;
+	boolean loading;
 	BackgroundImage[] imgBattleship= new BackgroundImage[5];
 	BackgroundImage[] imgDreadnought= new BackgroundImage[4];
 	BackgroundImage[] imgDestroyer= new BackgroundImage[3];
@@ -50,56 +51,57 @@ public class Control {
 	BackgroundImage imgRedFlag;
 	BackgroundImage imgWhiteFlag;
 	BackgroundImage imgHit;
+	Socket socket;
 	
 	
-	public Control(VBox down,VBox up, VBox divider,boolean testMode){
+	public Control(VBox down,VBox up, VBox divider,
+			boolean hostPlayer, boolean loading, Socket socket){
 		this.down =down;
 		this.up = up;
 		this.divider=divider;
 		this.divider.getChildren().addAll(lblInfText);
-		this.testMode=testMode;
+		this.hostPlayer=hostPlayer;
+		this.loading =loading;
+		this.socket=socket;
+		IOSystem.socket=socket;
 		initGame();	 
 	}
 	
 	private void initGame() {
-		hostPlayer = true;// Muss eigentlich bei Wahl von host oder Client gesetzt werden
 		
-		
-		try {
-			
-			playingField = IOSystem.readFile();
-		} catch (ClassNotFoundException | IOException e) {
-			playingField = new PlayingField(testMode);
+		if(loading){
+			try {
+				
+				playingField = IOSystem.readFile();
+			} catch (ClassNotFoundException | IOException e) {
+				
+				System.out.println("Spiel nicht vorhanden.");
+			}
+		}else{
+			playingField = new PlayingField();
 			if(hostPlayer){
 				playingField.getPlayerOne().setTurn(true);
+				IOSystem.writeFile(playingField);
 			}
-			IOSystem.writeFile(playingField);
-			//Falls es noch kein Spiel gibt oder es Fehlerhaft ist, schreib ein neues
+			
 		}
+		
 		 infoText = new InfoText(playingField.getPlayerOne(),playingField.getPlayerTwo());
 		 
 		createGUIGrid();	
 		loadImageBuffer();
-		KIThread = new Thread(new KI());
-		KIThread.setDaemon(true);
-		KIThread.start();
+		if(socket == null){
+			KIThread = new Thread(new KI());
+			KIThread.setDaemon(true);
+			KIThread.start();
+		}
 		readGame = new Thread(new Runnable(){
 			@Override
-			public void run() {
-				while (true){				
-					try {
-						Thread.sleep(1000);
-						if(!Mutex.mutex)playingField = IOSystem.readFile();
-						if(testMode)shootRandom();
-						infoText.setShip1(playingField.getPlayerOne().getShips());
-						infoText.setShip2(playingField.getPlayerTwo().getShips());
-					} catch (ClassNotFoundException |InterruptedException| IOException e) {
-						System.out.println("Spieler lesefehler");
-					}
-				}		
-			}
+		public void run() {
+			while (true){				
+				readGameFile();
+			}}});
 
-			});
 		readGame.setDaemon(true);
 		readGame.start();
 		
@@ -107,27 +109,22 @@ public class Control {
 			@Override
 			public void run() {
 				while (true){
-					try {
-						Thread.sleep(50);
-						
-							Platform.runLater(new Runnable(){
-							@Override
-							public void run() {
-								refreshColor();
-								infoText.setWaiting(!isAktivPlayersTurn());
-								setText();
-							}
-						
-							});
-					} catch (InterruptedException e) {
-						System.out.println("Spieler lesefehler");
-					}
-					
+					refreshColor();
 				}}});
 		colorRefresh.setDaemon(true);
 		colorRefresh.start();
 	}
 	
+	private void readGameFile() {
+		try {
+			Thread.sleep(1000);
+			if(!Mutex.mutex)playingField = IOSystem.readFile();
+			infoText.setShip1(playingField.getPlayerOne().getShips());
+			infoText.setShip2(playingField.getPlayerTwo().getShips());
+		} catch (ClassNotFoundException |InterruptedException| IOException e) {
+			System.out.println("Spieler lesefehler");
+		}
+	}
 
 	private void shootRandom(){
 	Random rnd = new Random();
@@ -192,79 +189,100 @@ public class Control {
 	}
 	
 	public void refreshColor(){
-		bfUp 			= playingField.getBattlefieldTwo();
-		bfDown			= playingField.getBattlefieldOne();
-		bgStrokeColor 	= Color.BLACK;
-		Figure  f;
-		for(int i = 0; i<10 ; i++){
-			for(int j = 0; j<10 ; j++){
-				 f = bfUp[i][j];	
-				columnUp[i][j].setBorder(new Border(new BorderStroke(bgStrokeColor, BorderStrokeStyle.SOLID, null, null)));
-				if(isAktivPlayersTurn()&& i == mousePoint.x && j == mousePoint.y)columnUp[i][j].setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null,new BorderWidths(5))));
-
-				if (f== null){ 
-					columnUp[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
-					
-				}else if (f instanceof Pin){
-					columnUp[i][j].setBackground(new Background(imgWhiteFlag));
-				}else{
-					Ship s = ((Ship)f);
-					int picNum = i - s.position.x + j - s.position.y;
-					if(s.isDestroyed()) {
-						if (f instanceof Battleship)
-							columnUp[i][j].setBackground(new Background(imgBattleship[picNum]));
-						if (f instanceof Dreadnought)
-							columnUp[i][j].setBackground(new Background(imgDreadnought[picNum]));
-						if (f instanceof Destroyer)
-							columnUp[i][j].setBackground(new Background(imgDestroyer[picNum]));
-						if (f instanceof Submarine)
-							columnUp[i][j].setBackground(new Background(imgSubmarine[picNum]));
-						if (!((Ship)f).isHorizontal()) columnUp[i][j].setRotate(-90);
-							columnUp[i][j].setBackground(new Background(columnUp[i][j].getBackground().getImages().get(0),(imgHit)));
-					}else if(s.isHit(new Point(i,j))){
-						columnUp[i][j].setBackground(new Background(imgRedFlag));
-					}
-					
-				}			
-			}
+		try {
+			Thread.sleep(50);
 			
-		}
-		
-		for(int i = 0; i<10 ; i++){
-			for(int j = 0; j<10 ; j++){
-				f = bfDown[i][j];	
-				columnDown[i][j].setBorder(new Border(new BorderStroke(bgStrokeColor, BorderStrokeStyle.SOLID, null, null)));
-				if (f== null){
-					columnDown[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
-				}else if (f instanceof Pin){
-					columnDown[i][j].setBackground(new Background(imgWhiteFlag));
-				}else{
-					Ship s = ((Ship)f);
-					int picNum = i - s.position.x + j - s.position.y;
-					if(s.isHit(new Point(i,j))){
-						if (f instanceof Battleship)
-							columnDown[i][j].setBackground(new Background(imgBattleship[picNum],imgHit));
-						if (f instanceof Dreadnought)
-							columnDown[i][j].setBackground(new Background(imgDreadnought[picNum],imgHit));
-						if (f instanceof Destroyer)
-							columnDown[i][j].setBackground(new Background(imgDestroyer[picNum],imgHit));
-						if (f instanceof Submarine)
-							columnDown[i][j].setBackground(new Background(imgSubmarine[picNum],imgHit));
-						if (!((Ship)f).isHorizontal()) columnDown[i][j].setRotate(-90);
+				Platform.runLater(new Runnable(){
+				@Override
+				public void run() {
+					if(hostPlayer){
+						bfUp 			= playingField.getBattlefieldTwo();
+						bfDown			= playingField.getBattlefieldOne();
 					}else{
-							if (f instanceof Battleship)
-								columnDown[i][j].setBackground(new Background(imgBattleship[picNum]));
-							if (f instanceof Dreadnought)
-								columnDown[i][j].setBackground(new Background(imgDreadnought[picNum]));
-							if (f instanceof Destroyer)
-								columnDown[i][j].setBackground(new Background(imgDestroyer[picNum]));
-							if (f instanceof Submarine)
-								columnDown[i][j].setBackground(new Background(imgSubmarine[picNum]));
-							if (!((Ship)f).isHorizontal()) columnDown[i][j].setRotate(-90);
+						bfUp 			= playingField.getBattlefieldOne();
+						bfDown			= playingField.getBattlefieldTwo();
 					}
+					
+					bgStrokeColor 	= Color.BLACK;
+					Figure  f;
+					for(int i = 0; i<10 ; i++){
+						for(int j = 0; j<10 ; j++){
+							 f = bfUp[i][j];	
+							columnUp[i][j].setBorder(new Border(new BorderStroke(bgStrokeColor, BorderStrokeStyle.SOLID, null, null)));
+							if(isAktivPlayersTurn()&& i == mousePoint.x && j == mousePoint.y)columnUp[i][j].setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null,new BorderWidths(5))));
+
+							if (f== null){ 
+								columnUp[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
+								
+							}else if (f instanceof Pin){
+								columnUp[i][j].setBackground(new Background(imgWhiteFlag));
+							}else{
+								Ship s = ((Ship)f);
+								int picNum = i - s.position.x + j - s.position.y;
+								if(s.isDestroyed()) {
+									if (f instanceof Battleship)
+										columnUp[i][j].setBackground(new Background(imgBattleship[picNum]));
+									if (f instanceof Dreadnought)
+										columnUp[i][j].setBackground(new Background(imgDreadnought[picNum]));
+									if (f instanceof Destroyer)
+										columnUp[i][j].setBackground(new Background(imgDestroyer[picNum]));
+									if (f instanceof Submarine)
+										columnUp[i][j].setBackground(new Background(imgSubmarine[picNum]));
+									if (!((Ship)f).isHorizontal()) columnUp[i][j].setRotate(-90);
+										columnUp[i][j].setBackground(new Background(columnUp[i][j].getBackground().getImages().get(0),(imgHit)));
+								}else if(s.isHit(new Point(i,j))){
+									columnUp[i][j].setBackground(new Background(imgRedFlag));
+								}
+								
+							}			
+						}
+						
+					}
+					
+					for(int i = 0; i<10 ; i++){
+						for(int j = 0; j<10 ; j++){
+							f = bfDown[i][j];	
+							columnDown[i][j].setBorder(new Border(new BorderStroke(bgStrokeColor, BorderStrokeStyle.SOLID, null, null)));
+							if (f== null){
+								columnDown[i][j].setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
+							}else if (f instanceof Pin){
+								columnDown[i][j].setBackground(new Background(imgWhiteFlag));
+							}else{
+								Ship s = ((Ship)f);
+								int picNum = i - s.position.x + j - s.position.y;
+								if(s.isHit(new Point(i,j))){
+									if (f instanceof Battleship)
+										columnDown[i][j].setBackground(new Background(imgBattleship[picNum],imgHit));
+									if (f instanceof Dreadnought)
+										columnDown[i][j].setBackground(new Background(imgDreadnought[picNum],imgHit));
+									if (f instanceof Destroyer)
+										columnDown[i][j].setBackground(new Background(imgDestroyer[picNum],imgHit));
+									if (f instanceof Submarine)
+										columnDown[i][j].setBackground(new Background(imgSubmarine[picNum],imgHit));
+									if (!((Ship)f).isHorizontal()) columnDown[i][j].setRotate(-90);
+								}else{
+										if (f instanceof Battleship)
+											columnDown[i][j].setBackground(new Background(imgBattleship[picNum]));
+										if (f instanceof Dreadnought)
+											columnDown[i][j].setBackground(new Background(imgDreadnought[picNum]));
+										if (f instanceof Destroyer)
+											columnDown[i][j].setBackground(new Background(imgDestroyer[picNum]));
+										if (f instanceof Submarine)
+											columnDown[i][j].setBackground(new Background(imgSubmarine[picNum]));
+										if (!((Ship)f).isHorizontal()) columnDown[i][j].setRotate(-90);
+								}
+							}
+						
+						}
+					}
+					infoText.setWaiting(!isAktivPlayersTurn());
+					setText();
 				}
 			
-			}
+				});
+		
+		
+		} catch (InterruptedException e) {
 		}
 	}
 	
