@@ -5,6 +5,9 @@ package game;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Optional;
+
+import org.controlsfx.dialog.Dialogs;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -51,6 +54,7 @@ public class startGUI extends Application {
 		
 	}
 
+
 	private void ConnectScreen(boolean i) {
 		if(i){
 			try {
@@ -62,13 +66,26 @@ public class startGUI extends Application {
 				e.printStackTrace();
 			}
 		}else{
-			try {
-				Socket socket = new Socket("127.0.0.1",50000);
-				new Control(oben,unten, trenner,false,false,socket);	
-			} catch (IOException e) {
+			
+				@SuppressWarnings("deprecation")
+				Optional<String> response = Dialogs.create()
+				        .owner(primaryStage)
+				        .title("Ziel-IP")
+				        .masthead("")
+				        .message("Tragen sie bitte die Ziel IP_Adresse ein.")
+				        .showTextInput("127.0.0.1");
+
+				response.ifPresent(name -> {
+				
+				try {
+				Socket socket = new Socket(name,50000);
+				new Control(oben,unten, trenner,false,false,socket);
+				} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+					e.printStackTrace();
+				}
+				});	
+			
 		}
 		loadScene();
 	}
