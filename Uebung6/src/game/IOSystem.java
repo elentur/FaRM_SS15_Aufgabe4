@@ -21,7 +21,6 @@ public class IOSystem  {
 			in.close();
 			return readedPlayingField;
 		}else{
-			//InputStream in = socket.getInputStream().
 			ObjectInputStream  in = new ObjectInputStream(socket.getInputStream());
 			PlayingField readedPlayingField = (PlayingField)in.readObject();
 			return readedPlayingField;

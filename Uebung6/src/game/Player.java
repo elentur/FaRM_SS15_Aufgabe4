@@ -22,9 +22,7 @@ public class Player implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public Player(String name,
-			Figure[][] myBattlefield,Figure[][] enemiesBattlefield){
-		this.name = name;
+	public Player(Figure[][] myBattlefield,Figure[][] enemiesBattlefield){
 		this.myBattlefield=myBattlefield;
 		this.enemiesBattlefield = enemiesBattlefield;
 		//my field where i save my ships, but not playing with it
@@ -35,7 +33,9 @@ public class Player implements Serializable{
 	public String getName(){
 		return name;
 	}
-	
+	public void setName(String name){
+		this.name = name;
+	}
 	public List<Ship> getShips(){
 		return ships;
 	}

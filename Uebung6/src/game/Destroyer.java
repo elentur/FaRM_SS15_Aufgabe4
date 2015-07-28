@@ -12,6 +12,7 @@ public class Destroyer  extends Ship{
 		super(position,horizontal);
 		size = 3;
 		hit = new boolean[3];
+		name="Zerstörer";
 			
 	}
 }

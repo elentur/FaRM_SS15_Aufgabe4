@@ -15,6 +15,7 @@ public abstract class Ship implements Figure {
 	protected boolean destroyed=false;
 	protected boolean[] hit;
 	protected Point position;
+	protected String name;
 	public Ship(Point position,boolean horizontal){
 		this.position = position;
 		this.horizontal=horizontal;
@@ -55,5 +56,8 @@ public abstract class Ship implements Figure {
 			}
 		}
 		return true;
+	}
+	public String getName(){
+		return name;
 	}
 }

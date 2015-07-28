@@ -12,6 +12,7 @@ public class Dreadnought  extends Ship {
 		super(position,horizontal);
 		size = 4;
 		hit = new boolean[4];
+		name ="Kreuzer";
 			
 	}
 }

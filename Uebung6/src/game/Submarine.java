@@ -12,6 +12,7 @@ public class Submarine  extends Ship{
 		super(position,horizontal);
 		size = 2;
 		hit = new boolean[2];
+		name = "U-Boot";
 			
 	}
 }

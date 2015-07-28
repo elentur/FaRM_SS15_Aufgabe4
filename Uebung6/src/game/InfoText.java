@@ -13,7 +13,8 @@ public class InfoText implements Figure {
 	private  String msg ="";
 	private String waitingMsg="";
 	private  Player p1,p2;
-	private boolean wait;
+	private 	String chat="";
+	//private boolean wait;
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -34,7 +35,7 @@ public class InfoText implements Figure {
 
 
 	public void setWaiting(boolean wait){
-		this.wait = wait;
+		//this.wait = wait;
 		if(wait){
 			waitingMsg = "Warte auf anderen Spieler...";
 		}else{
@@ -45,7 +46,15 @@ public class InfoText implements Figure {
 	public void setLap(int lap) {
 		this.lap = lap;
 	}
-
+	
+	public void setPlayer1(Player p1) {
+		this.p1 = p1;
+		setShip1(p1.getShips());
+	}
+	public void setPlayer2(Player p2) {
+		this.p2 = p2;
+		setShip2(p2.getShips());
+	}
 
 
 
@@ -96,11 +105,16 @@ public class InfoText implements Figure {
 
 
 
-
+	
 	public  String info(){
-		
+		String s="";
+		try{
+			s="Runde: " +lap + "\n" + p1.getName() +"s Schiffe: " + ship1 + "\n" + p2.getName() +"s Schiffe: " + ship2 + "\n" + msg + " " + waitingMsg;
+		}catch(Exception e){
 			
-			return 	"Runde: " +lap + "\n" + p1.getName() +"s Schiffe: " + ship1 + "\n" + p2.getName() +"s Schiffe: " + ship2 + "\n" + msg + " " + waitingMsg;
+		}
+			
+			return 	s;
 			//return  msg + " " + waitingMsg;
 
 		

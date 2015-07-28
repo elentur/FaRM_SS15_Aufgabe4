@@ -2,6 +2,7 @@ package game;
 
 
 
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,6 +14,8 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -21,9 +24,11 @@ public class startGUI extends Application {
 	VBox oben= new VBox(), unten = new VBox();
 	VBox trenner = new VBox();
 	VBox root2 = new VBox(50);
-	Scene scene = new Scene(root, 400,900);
+	Scene scene = new Scene(root, 400,1010);
 	Scene startScreen = new Scene(root2,400,600);
 	Stage primaryStage; 
+	TextField txtEingabe = new TextField();
+	TextArea txtAusgabe = new TextArea();
 	@Override
 	public void start(Stage primaryStage) {
 
@@ -55,19 +60,24 @@ public class startGUI extends Application {
 	}
 
 
+	@SuppressWarnings({ "deprecation", "resource" })
 	private void ConnectScreen(boolean i) {
 		if(i){
 			try {
-				ServerSocket serverSocket = new ServerSocket(50000);
+				ServerSocket serverSocket = new ServerSocket(8080);
 				Socket socketClient =  serverSocket.accept();
-				new Control(oben,unten, trenner,true,false,socketClient);	
+				new Control(oben,unten, trenner,txtAusgabe,txtEingabe,true,false,socketClient, name());
+				loadScene();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Dialogs.create()
+				.owner(primaryStage)
+		        .title("Fehler")
+		        .masthead("Verbindungsfehler")
+		        .message("Es konnte keine Verbindung hergestellt werden!")
+		        .showException(e);
 			}
 		}else{
 			
-				@SuppressWarnings("deprecation")
 				Optional<String> response = Dialogs.create()
 				        .owner(primaryStage)
 				        .title("Ziel-IP")
@@ -78,23 +88,43 @@ public class startGUI extends Application {
 				response.ifPresent(name -> {
 				
 				try {
-				Socket socket = new Socket(name,50000);
-				new Control(oben,unten, trenner,false,false,socket);
+				Socket socket = new Socket(name,8080);
+				new Control(oben,unten, trenner,txtAusgabe,txtEingabe,false,false,socket,name());
+				loadScene();
 				} catch (IOException e) {
-				// TODO Auto-generated catch block
-					e.printStackTrace();
+					Dialogs.create()
+							.owner(primaryStage)
+					        .title("Fehler")
+					        .masthead("Verbindungsfehler")
+					        .message("Es konnte keine Verbindung hergestellt werden!")
+					        .showException(e);
 				}
 				});	
 			
 		}
-		loadScene();
+		
 	}
+
+	private String name() {
+		Optional<String> name = Dialogs.create()
+		        .owner(primaryStage)
+		        .title("Spielername")
+		        .masthead("")
+		        .message("Tragen sie bitte ihren namen ein.")
+		        .showTextInput("Spieler");
+
+		if (name.isPresent()) {
+		   return name.get();
+		}
+		return "Spieler";
+	}
+
 
 	private void startGame(boolean i) {
 		if(i){
-			new Control(oben,unten, trenner,true,false,null);	
+			new Control(oben,unten, trenner,txtAusgabe,txtEingabe,true,false,null,name());	
 		}else{
-			new Control(oben,unten, trenner,true,true,null);	
+			new Control(oben,unten, trenner,txtAusgabe,txtEingabe,true,true,null,null);	
 		}
 		loadScene();
 		
@@ -106,11 +136,15 @@ public class startGUI extends Application {
 		oben.prefWidthProperty().bind(scene.widthProperty());
 		unten.prefHeightProperty().bind(scene.widthProperty());
 		unten.prefWidthProperty().bind(scene.widthProperty());
-		trenner.setMinHeight(70);
-		trenner.setMaxHeight(70);
+		trenner.setMinHeight(180);
+		trenner.setMaxHeight(180);
+		txtAusgabe.setMinHeight(80);
+		txtAusgabe.setMaxHeight(80);
+		trenner.getChildren().addAll(txtAusgabe,txtEingabe);
+		txtAusgabe.setEditable(false);
 		root.getChildren().addAll(unten,trenner,oben);
-		primaryStage.maxHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(110.0));
-		primaryStage.minHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(110.0));
+		primaryStage.maxHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(220.0));
+		primaryStage.minHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(220.0));
 		
 	}
 

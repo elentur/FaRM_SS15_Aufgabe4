@@ -4,6 +4,9 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.net.Socket;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 public class PlayingField implements Serializable{
 
 	/**
@@ -15,13 +18,14 @@ public class PlayingField implements Serializable{
 	private Figure[][]  battlefieldTwo;
 	private Player playerOne;
 	private Player playerTwo;
-
+	private String chat="";
+	
 	
 	public PlayingField(){
 		battlefieldOne = new Figure[10][10];
 		battlefieldTwo = new Figure[10][10];
-		playerOne = new Player("Spieler",battlefieldOne,battlefieldTwo);
-		playerTwo = new Player("KI",battlefieldTwo,battlefieldOne);
+		playerOne = new Player(battlefieldOne,battlefieldTwo);
+		playerTwo = new Player(battlefieldTwo,battlefieldOne);
 
 		
 	}
@@ -56,19 +60,31 @@ public class PlayingField implements Serializable{
 	}
 	public boolean  shoot(Point pos){
 		Figure[][]	battlefield;
+		String name="";
 		if (playerOne.isTurn()){
 			battlefield = battlefieldTwo;
+			name = playerOne.getName();
 		}else{
 			battlefield = battlefieldOne;
+			name = playerTwo.getName();
 		}
 		
 		if(battlefield[pos.x][pos.y]== null){
 			battlefield[pos.x][pos.y] = new Pin();
+			addChat(name + " hat daneben geschossen.");
+			PlayAudio.playWater();
 		}else if(battlefield[pos.x][pos.y] instanceof Ship ){
 			Ship ship = (Ship)battlefield[pos.x][pos.y];
 			if(!ship.hitShip(pos)  ){
 				return false;
 			}
+			if (ship.isDestroyed()){
+				addChat(name + " hat ein(en) " + ship.getName() + " versenkt.");
+			}else{
+				addChat(name + " hat getroffen.");
+			}
+			PlayAudio.playShip();
+			
 		}else {
 			return false;
 		}
@@ -85,6 +101,7 @@ public class PlayingField implements Serializable{
 	public Figure[][] getBattlefieldOne(){
 		return battlefieldOne;
 	}
+	
 	public Figure[][] getBattlefieldTwo(){
 		return battlefieldTwo;
 	}
@@ -100,16 +117,26 @@ public class PlayingField implements Serializable{
 			if(playerOne.getShips().get(i).isDestroyed())ships--;
 		}
 		if (ships ==0){
-			System.out.println(playerTwo.getName() + " hat das Spiel gewonnen.");
-			System.exit(0);
+			//System.out.println(playerTwo.getName() + " hat das Spiel gewonnen.");
+			addChat(playerTwo.getName() + " hat das Spiel gewonnen.");
+			//System.exit(0);
 		}
 		ships =10;
 		for (int i=0 ; i<10;i++){
 			if(playerTwo.getShips().get(i).isDestroyed())ships--;
 		}
 		if (ships ==0){
-			System.out.println(playerOne.getName() + " hat das Spiel gewonnen.");
-			System.exit(0);
+			//System.out.println(playerOne.getName() + " hat das Spiel gewonnen.");
+			addChat(playerOne.getName() + " hat das Spiel gewonnen.");
+			//System.exit(0);
 		}
+	}
+	
+	public String getChat(){
+		return chat;
+	}
+	
+	public void addChat(String text){
+		chat = chat + "\n" +text;
 	}
 }

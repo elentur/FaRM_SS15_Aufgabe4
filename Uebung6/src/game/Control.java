@@ -12,6 +12,8 @@ import java.util.Random;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -24,6 +26,8 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 
 
@@ -32,6 +36,8 @@ public class Control {
 	VBox[][] columnDown = new VBox[10][10];
 	HBox[] rowUp = new HBox[10];
 	VBox[][] columnUp = new VBox[10][10];
+	TextArea txtOutput;
+	TextField txtInput;
 	PlayingField playingField;
 	Figure[][] bfUp,bfDown;
 	VBox down,up,divider;
@@ -54,25 +60,29 @@ public class Control {
 	Socket socket;
 	
 	
-	public Control(VBox down,VBox up, VBox divider,
-			boolean hostPlayer, boolean loading, Socket socket){
+	public Control(VBox down,VBox up, VBox divider,TextArea txtOutput, TextField txtInput, 
+			boolean hostPlayer, boolean loading, Socket socket, String name){
 		this.down =down;
 		this.up = up;
 		this.divider=divider;
+		this.txtInput=txtInput;
+		this.txtOutput=txtOutput;
+		
 		this.divider.getChildren().addAll(lblInfText);
 		this.hostPlayer=hostPlayer;
 		this.loading =loading;
 		this.socket=socket;
 		IOSystem.socket=socket;
-		initGame();	 
+		initGame(name);	 
 	}
 	
-	private void initGame() {
+	private void initGame(String name) {
 		
 		if(loading){
 			try {
 				
 				playingField = IOSystem.readFile();
+				
 			} catch (ClassNotFoundException | IOException e) {
 				
 				System.out.println("Spiel nicht vorhanden.");
@@ -81,13 +91,32 @@ public class Control {
 			playingField = new PlayingField();
 			if(hostPlayer){
 				playingField.getPlayerOne().setTurn(true);
+				playingField.getPlayerOne().setName(name);
+				playingField.getPlayerTwo().setName("KI");
 				IOSystem.writeFile(playingField);
+			}else{
+				try {
+					playingField = IOSystem.readFile();
+					playingField.getPlayerTwo().setName(name);
+					IOSystem.writeFile(playingField);
+				} catch (ClassNotFoundException | IOException e) {
+				}
+				
 			}
 			
 		}
 		
-		 infoText = new InfoText(playingField.getPlayerOne(),playingField.getPlayerTwo());
-		 
+		infoText = new InfoText();
+		infoText.setPlayer1(playingField.getPlayerOne());
+		infoText.setPlayer2(playingField.getPlayerTwo());
+		txtInput.setOnAction(e->{
+			playingField.addChat(name + ": " + txtInput.getText());
+			txtInput.setText("");
+			Mutex.setMutex(true);
+			IOSystem.writeFile(playingField);
+			Mutex.setMutex(false);
+			
+		});	
 		createGUIGrid();	
 		loadImageBuffer();
 		if(socket == null){
@@ -119,8 +148,10 @@ public class Control {
 		try {
 			Thread.sleep(1000);
 			if(!Mutex.mutex)playingField = IOSystem.readFile();
-			infoText.setShip1(playingField.getPlayerOne().getShips());
-			infoText.setShip2(playingField.getPlayerTwo().getShips());
+		//	infoText.setShip1(playingField.getPlayerOne().getShips());
+			//infoText.setShip2(playingField.getPlayerTwo().getShips());
+			infoText.setPlayer1(playingField.getPlayerOne());
+			infoText.setPlayer2(playingField.getPlayerTwo());
 		} catch (ClassNotFoundException |InterruptedException| IOException e) {
 			System.out.println("Spieler lesefehler");
 		}
@@ -287,6 +318,12 @@ public class Control {
 	}
 	
 	public void setText(){
+		if(!playingField.getChat().equals( txtOutput.getText())){
+				txtOutput.setText(playingField.getChat());
+				txtOutput.selectPositionCaret(txtOutput.getLength());
+				txtOutput.deselect(); 
+		}
+		
 		lblInfText.setText(infoText.info());
 	}
 	
@@ -297,6 +334,7 @@ public class Control {
 				if(!playingField.shoot(pos)){
 					infoText.setMsg("Darauf hast du bereits geschossen");
 					setText();
+					
 					return;
 				}	
 				

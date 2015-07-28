@@ -15,7 +15,7 @@ public class Battleship extends Ship {
 		super(position,horizontal);
 		size = 5;
 		hit = new boolean[5];
-		
+		name ="Kriegsschiff";
 	}
 	
 }
