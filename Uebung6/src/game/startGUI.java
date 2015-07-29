@@ -16,12 +16,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class startGUI extends Application {
 	VBox root = new VBox();
-	VBox oben= new VBox(), unten = new VBox();
+	//VBox oben= new VBox(), unten = new VBox();
+	GridPane oben= new GridPane(), unten = new GridPane();
 	VBox trenner = new VBox();
 	VBox root2 = new VBox(50);
 	Scene scene = new Scene(root, 400,1010);
@@ -143,9 +145,10 @@ public class startGUI extends Application {
 		trenner.getChildren().addAll(txtAusgabe,txtEingabe);
 		txtAusgabe.setEditable(false);
 		root.getChildren().addAll(unten,trenner,oben);
-		primaryStage.maxHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(220.0));
-		primaryStage.minHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(220.0));
-		
+		//primaryStage.maxHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(220.0));
+		//primaryStage.minHeightProperty().bind(unten.prefWidthProperty().multiply(2.0).add(220.0));
+		primaryStage.minHeightProperty().bind(primaryStage.widthProperty().multiply(2.0).add(220.0));
+		primaryStage.maxHeightProperty().bind(primaryStage.widthProperty().multiply(2.0).add(220.0));
 	}
 
 	public static void main(String[] args) {
